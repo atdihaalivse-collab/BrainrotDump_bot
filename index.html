@@ -17,8 +17,8 @@
         .coin-display{background:linear-gradient(45deg,rgba(255,215,0,0.2),rgba(255,170,0,0.1));border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:8px 16px;margin:6px auto;max-width:300px}
         .coin-val{font-size:18px;font-weight:bold;color:#ffd700}
         .coin-inc{font-size:10px;color:#ffaa00;display:block}
+        .offline-earn{font-size:10px;color:#00ff88;margin-top:2px}
         
-        /* КНОПКИ - БОЛЬШИЕ */
         .tabs{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}
         .tab-btn{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.25);color:#fff;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:16px;font-family:monospace;transition:all 0.3s;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
         .tab-btn.active{background:#ff00ff;border-color:#ff00ff;box-shadow:0 0 15px rgba(255,0,255,0.6);transform:scale(1.08)}
@@ -40,7 +40,6 @@
         @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-10px,4px)}40%{transform:translate(10px,-4px)}}
         .flash-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000;opacity:0;transition:opacity 0.15s}
 
-        /* ИНВЕНТАРЬ - КАРТОЧКИ ПОКРУПНЕЕ */
         .inv-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         .inv-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;width:75px;border:3px solid #888;font-size:8px;cursor:pointer;position:relative;overflow:hidden;transition:all 0.3s}
         .inv-item:active{transform:scale(0.92)}
@@ -64,10 +63,8 @@
         .inv-emoji{font-size:28px;display:block}
         .inv-name{font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .inv-lvl{font-size:8px;color:#ffd700;font-weight:bold}
-        .inv-income{font-size:8px;color:#ffaa00}
         .inv-badge{position:absolute;top:-4px;right:-4px;background:#ff00ff;color:#fff;border-radius:50%;width:20px;height:20px;font-size:10px;line-height:20px;font-weight:bold}
 
-        /* АНИМАЦИИ */
         .rarity-chrome .inv-emoji{animation:chromeShake 2.5s infinite}
         @keyframes chromeShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}}
         .rarity-common .inv-emoji{animation:commonBounce 3s infinite}
@@ -81,10 +78,8 @@
         .rarity-mythic .inv-emoji{animation:mythicDance 1.5s infinite}
         @keyframes mythicDance{0%{transform:translate(0,0) rotate(0) scale(1)}20%{transform:translate(5px,-6px) rotate(15deg) scale(1.2)}40%{transform:translate(-5px,6px) rotate(-15deg) scale(0.8)}60%{transform:translate(3px,-4px) rotate(10deg) scale(1.1)}80%{transform:translate(-3px,4px) rotate(-10deg) scale(0.9)}}
 
-        /* ПРОКАЧКА - ПЛИТКИ */
         .upg-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         .upg-card{background:rgba(255,255,255,0.04);border-radius:12px;padding:10px;width:100%;max-width:380px;border:3px solid #555;text-align:left;transition:all 0.3s}
-        .upg-card:active{transform:scale(0.97)}
         .upg-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
         .upg-emoji{font-size:36px;animation:upgFloat 2s infinite}
         @keyframes upgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -94,11 +89,8 @@
         .upg-btns{display:flex;gap:6px}
         .btn-upg{background:linear-gradient(45deg,#ffd700,#ffaa00);color:#000;border:none;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;flex:1;font-family:monospace;font-weight:bold}
         .btn-upg:disabled{background:#444;color:#888}
-        .btn-upg-max{background:#ff00ff;color:#fff;border:none;padding:10px 15px;border-radius:8px;font-size:12px;cursor:pointer;font-family:monospace;font-weight:bold}
 
-        /* КРАФТ - КРАСИВЫЙ */
         .craft-box{background:rgba(255,170,0,0.06);border-radius:16px;padding:15px;margin:10px 0;border:2px solid rgba(255,170,0,0.4)}
-        .craft-box h3{color:#ffaa00;margin-bottom:8px;font-size:16px}
         .craft-slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:55px;margin:12px 0}
         .craft-slot{width:48px;height:48px;border:2px dashed #555;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#555;transition:all 0.3s}
         .craft-slot.filled{border-color:#ffaa00;background:rgba(255,170,0,0.15);animation:slotPulse 1.5s infinite}
@@ -109,7 +101,6 @@
         .btn-craft:disabled{background:#444;color:#888;box-shadow:none}
         .craft-result{min-height:50px;padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;margin-top:8px;font-size:12px}
 
-        /* АУКЦИОН */
         .auc-card{background:rgba(0,255,136,0.05);border-radius:12px;padding:10px;margin:6px 0;border:2px solid rgba(0,255,136,0.3);display:flex;align-items:center;gap:10px;font-size:11px;text-align:left}
         .auc-card button{background:#00ff88;color:#000;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;font-family:monospace}
         .btn-sell{background:#00ff88;color:#000;border:none;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;font-family:monospace;font-weight:bold;margin-top:6px}
@@ -117,7 +108,6 @@
         .trade-box{background:rgba(255,255,255,0.05);border-radius:12px;padding:12px;margin:8px 0;border:1px solid rgba(255,255,255,0.15)}
         .trade-box input,.auc-input{width:100%;padding:12px;margin:5px 0;background:#111;border:2px solid #444;color:#fff;border-radius:8px;font-size:14px;font-family:monospace}
         .btn{background:linear-gradient(45deg,#ff00ff,#cc00cc);color:#fff;border:none;padding:14px;border-radius:8px;font-size:15px;cursor:pointer;width:100%;font-family:monospace;font-weight:bold;margin-top:6px;box-shadow:0 0 12px rgba(255,0,255,0.3)}
-        .btn:active{transform:scale(0.95)}
         .trade-slot{border:2px dashed #555;border-radius:8px;padding:12px;margin:4px 0;cursor:pointer;font-size:12px;color:#888;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center}
         .trade-slot.filled{border-color:#00ff88;background:rgba(0,255,136,0.1)}
         .history-box{background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;max-height:200px;overflow-y:auto;font-size:10px}
@@ -128,7 +118,7 @@
     <div class="container">
         <h1>🧠 Brainrot Collector</h1>
         <p id="username" style="color:#888;font-size:11px">...</p>
-        <div class="coin-display">🪙 <span class="coin-val" id="coins">100</span> <span class="coin-inc">+<span id="incomePerMin">0</span>/мин</span></div>
+        <div class="coin-display">🪙 <span class="coin-val" id="coins">100</span> <span class="coin-inc">+<span id="incomePerMin">0</span>/мин</span><div class="offline-earn" id="offlineEarn"></div></div>
         <p style="color:#666;font-size:9px">ID: <span id="myId"></span></p>
 
         <div class="tabs">
@@ -154,12 +144,11 @@
         </div>
 
         <div class="tab-content" id="tab-inv"><h3 style="color:#00ffff;margin:8px 0;font-size:14px">📦 Инвентарь</h3><div class="inv-grid" id="inventory"></div></div>
-        
         <div class="tab-content" id="tab-upg"><h3 style="color:#ffd700;margin:8px 0;font-size:14px">⬆ Прокачка (1-20 ур.)</h3><div class="upg-grid" id="upgradeList"></div></div>
         
         <div class="tab-content" id="tab-craft">
             <div class="craft-box">
-                <h3>🔨 Крафт Брейнротов</h3>
+                <h3 style="color:#ffaa00;margin-bottom:8px;font-size:16px">🔨 Крафт Брейнротов</h3>
                 <div class="craft-chances">
                     <div><span>5%</span> Мифик/Лега</div><div><span>20%</span> Эпик</div><div><span>30%</span> Редкое</div><div><span>45%</span> Обычное</div>
                 </div>
@@ -275,7 +264,6 @@
         document.getElementById('sendTradeBtn').addEventListener('click', sendTrade);
         document.getElementById('caseCost').innerText = CASE_COST;
         
-        // Генерируем слоты крафта
         var slotsHtml='';
         for(var s=0;s<10;s++) slotsHtml+='<div class="craft-slot" id="slot'+s+'">?</div>';
         document.getElementById('craftSlots').innerHTML=slotsHtml;
@@ -283,22 +271,55 @@
         function init(){
             supabase.from('players').select('*').eq('tg_id',tgId).single().then(function(res){
                 var p=res.data;
-                if(!p){supabase.from('players').insert({tg_id:tgId,username:pn,coins:100}).then(function(){});p={total_opens:0,pity_counter:0,best_rarity:'none',coins:100};}
-                totalOpens=p.total_opens||0;pity=p.pity_counter||0;bestRarity=p.best_rarity||'none';coins=p.coins||100;
-                updateUI();loadInv();loadTrades();loadAuction();
-            }).catch(function(){updateUI();loadInv();loadTrades();loadAuction();});
-            setInterval(addPassiveIncome,60000);
+                var now = new Date();
+                if(!p){
+                    supabase.from('players').insert({tg_id:tgId,username:pn,coins:100,last_seen:now.toISOString()}).then(function(){});
+                    p={total_opens:0,pity_counter:0,best_rarity:'none',coins:100,last_seen:now.toISOString()};
+                }
+                totalOpens=p.total_opens||0;
+                pity=p.pity_counter||0;
+                bestRarity=p.best_rarity||'none';
+                coins=p.coins||100;
+                
+                // Начисляем доход за время отсутствия
+                var lastSeen = p.last_seen ? new Date(p.last_seen) : now;
+                var minutesPassed = Math.floor((now - lastSeen) / 60000);
+                
+                // Загружаем инвентарь для подсчёта дохода
+                supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(invRes){
+                    allInv = invRes.data || [];
+                    var incomePerMin = 0;
+                    for(var i=0;i<allInv.length;i++) incomePerMin += getItemIncome(allInv[i]);
+                    
+                    if(minutesPassed > 0 && incomePerMin > 0) {
+                        var earned = minutesPassed * incomePerMin;
+                        coins += earned;
+                        document.getElementById('offlineEarn').innerText = '💤 +' + earned + ' монет за ' + minutesPassed + ' мин';
+                        setTimeout(function(){document.getElementById('offlineEarn').innerText=''},10000);
+                    }
+                    
+                    supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:now.toISOString()}).then(function(){
+                        updateUI();loadInvUI();loadTrades();loadAuction();
+                    });
+                });
+            }).catch(function(){
+                updateUI();loadInvUI();loadTrades();loadAuction();
+            });
+            
+            // Каждую минуту начисляем доход и обновляем last_seen
+            setInterval(function(){
+                var totalInc = 0;
+                for(var i=0;i<allInv.length;i++) totalInc += getItemIncome(allInv[i]);
+                if(totalInc > 0){
+                    coins += totalInc;
+                    supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
+                    updateUI();
+                }
+            },60000);
+            
             setInterval(loadAuction,30000);
             var saved=localStorage.getItem('brainrot_history');
             if(saved) dropHistory=JSON.parse(saved);
-        }
-
-        function addPassiveIncome(){
-            var inc=0;
-            for(var i=0;i<allInv.length;i++) inc+=getItemIncome(allInv[i]);
-            coins+=inc;
-            supabase.from('players').upsert({tg_id:tgId,coins:coins}).then(function(){});
-            updateUI();
         }
 
         function getItemIncome(item){return Math.floor((baseIncome[item.rarity]||1)*(1+(item.upgrade_level||0)*0.5));}
@@ -327,7 +348,7 @@
             pity=['epic','legendary','mythic','rare'].includes(item.rarity)?0:pity+1;
             if(['chrome','common','rare','epic','legendary','mythic'].indexOf(item.rarity)>['chrome','common','rare','epic','legendary','mythic'].indexOf(bestRarity)) bestRarity=item.rarity;
             var isShiny = Math.random() < 0.02;
-            supabase.from('players').upsert({tg_id:tgId,total_opens:totalOpens,pity_counter:pity,best_rarity:bestRarity,coins:coins}).then(function(){});
+            supabase.from('players').upsert({tg_id:tgId,total_opens:totalOpens,pity_counter:pity,best_rarity:bestRarity,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
             supabase.from('inventory').insert({player_tg_id:tgId,item_id:item.id,item_name:item.name+(isShiny?' ✨':''),rarity:item.rarity,emoji:item.emoji,upgrade_level:0,is_shiny:isShiny}).then(function(){});
             dropHistory.unshift({emoji:item.emoji+(isShiny?'✨':''),name:item.name+(isShiny?' SHINY':''),rarity:item.rarity,color:item.color,time:new Date().toLocaleTimeString()});
             if(dropHistory.length>50) dropHistory.pop();
@@ -347,10 +368,10 @@
             }else{
                 document.getElementById('result').innerHTML='<span class="result-emoji">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+item.color+';font-size:16px">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br><span style="font-size:14px">'+item.name+'</span>';
             }
-            updateUI();loadInv();
+            updateUI();loadInvUI();
         }
 
-        function loadInv(){
+        function loadInvUI(){
             supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){
                 allInv = res.data || [];
                 allInv.sort(function(a,b){return (rarityOrder[a.rarity]||99)-(rarityOrder[b.rarity]||99)});
@@ -397,8 +418,8 @@
             coins-=cost;
             supabase.from('inventory').select('*').eq('id',id).single().then(function(res){
                 supabase.from('inventory').update({upgrade_level:(res.data.upgrade_level||0)+1}).eq('id',id).then(function(){
-                    supabase.from('players').upsert({tg_id:tgId,coins:coins}).then(function(){});
-                    updateUI();loadInv();loadUpgradeList();
+                    supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
+                    updateUI();loadInvUI();loadUpgradeList();
                 });
             });
         }
@@ -435,7 +456,7 @@
                     document.getElementById('craftButton').disabled=true;
                     btn.innerText='🔨 Выбери 10 одинаковых';
                     for(var s=0;s<10;s++){var slot=document.getElementById('slot'+s);slot.classList.remove('filled');slot.innerText='?';}
-                    loadInv();
+                    loadInvUI();
                     dropHistory.unshift({emoji:ri.emoji,name:'[Крафт] '+ri.name,rarity:ri.rarity,color:ri.color,time:new Date().toLocaleTimeString()});
                     localStorage.setItem('brainrot_history',JSON.stringify(dropHistory));
                 });
@@ -454,7 +475,7 @@
             if(!id||!price||price<1){alert('Выбери карточку и цену!');return;}
             supabase.from('auctions').insert({seller_tg_id:tgId,inventory_id:parseInt(id),price:price,status:'active'}).then(function(res){
                 if(res.error) alert('Ошибка');
-                else{alert('✅ Выставлено на аукцион!');loadInv();loadAuction();}
+                else{alert('✅ Выставлено на аукцион!');loadInvUI();loadAuction();}
             });
         }
 
@@ -484,8 +505,8 @@
                         supabase.from('players').select('coins').eq('tg_id',a.seller_tg_id).single().then(function(sr){
                             supabase.from('players').update({coins:(sr.data.coins||0)+price}).eq('tg_id',a.seller_tg_id).then(function(){});
                         });
-                        supabase.from('players').upsert({tg_id:tgId,coins:coins}).then(function(){});
-                        alert('✅ Куплено!');updateUI();loadInv();loadAuction();
+                        supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
+                        alert('✅ Куплено!');updateUI();loadInvUI();loadAuction();
                     });
                 });
             });
@@ -547,12 +568,12 @@
             document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active')});
             document.getElementById('tab-'+t).classList.add('active');
             document.getElementById('tb-'+t).classList.add('active');
-            if(t==='inv') loadInv();
+            if(t==='inv') loadInvUI();
             if(t==='upg') loadUpgradeList();
-            if(t==='auc'){loadInv();updateAuctionSelect();loadAuction();}
+            if(t==='auc'){loadInvUI();updateAuctionSelect();loadAuction();}
             if(t==='hist') renderHistory();
             if(t==='trade') loadTrades();
-            if(t==='craft') loadInv();
+            if(t==='craft') loadInvUI();
         }
 
         init();
