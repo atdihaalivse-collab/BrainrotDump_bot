@@ -385,3 +385,8 @@
             document.getElementById('pity-count').innerText = 10 - gameData.pityCounter;
             const bestMap = { 'none': '-', 'chrome': '🚽', 'common': '💚', 'rare': '💙', 'epic': '💜', 'legendary': '🧡', 'mythic': '❤️' };
             document.getElementById('best-rarity').innerText = bestMap[gameData.be
+// ========== ЗАПУСК ==========
+loadPlayer().catch(err => {
+    console.error('❌ Ошибка загрузки:', err);
+    document.getElementById('username').innerText = '⚠️ Ошибка подключения';
+});
