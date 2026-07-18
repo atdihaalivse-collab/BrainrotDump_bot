@@ -43,8 +43,8 @@
         @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-12px,4px)}40%{transform:translate(12px,-4px)}60%{transform:translate(-8px,8px)}80%{transform:translate(8px,-8px)}}
         .flash-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000;opacity:0;transition:opacity 0.1s}
 
-        .inv-grid{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
-        .inv-item{background:rgba(255,255,255,0.05);border-radius:10px;padding:5px;width:68px;border:3px solid #888;font-size:8px;transition:all 0.4s;cursor:pointer;position:relative;overflow:hidden}
+        .inv-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+        .inv-item{background:rgba(255,255,255,0.05);border-radius:10px;padding:6px;width:70px;border:3px solid #888;font-size:8px;transition:all 0.4s;cursor:pointer;position:relative;overflow:hidden}
         .inv-item.rarity-chrome{border-color:#888}
         .inv-item.rarity-common{border-color:#00ff00}
         .inv-item.rarity-rare{border-color:#0088ff}
@@ -53,35 +53,36 @@
         .inv-item.rarity-mythic{border-color:#ff0000}
         .inv-item:hover{transform:translateY(-2px) scale(1.05)}
         .inv-item.selected{border-color:#ff00ff!important;box-shadow:0 0 12px rgba(255,0,255,0.5);background:rgba(255,0,255,0.15)}
-        .inv-item.lvl-1{box-shadow:0 0 5px rgba(255,255,255,0.2)}
-        .inv-item.lvl-5{box-shadow:0 0 8px rgba(255,255,255,0.35)}
-        .inv-item.lvl-10{box-shadow:0 0 14px rgba(255,255,255,0.5);animation:glowLvl 2s infinite}
-        .inv-item.lvl-15{box-shadow:0 0 22px rgba(255,255,255,0.7);animation:glowLvl 1.2s infinite}
-        .inv-item.lvl-20{box-shadow:0 0 30px rgba(255,255,255,0.9);animation:rainbowGlow 2s infinite;border-width:3px;border-image:linear-gradient(45deg,red,orange,yellow,lime,cyan,blue,magenta,red) 1}
-        @keyframes glowLvl{0%,100%{box-shadow:0 0 14px rgba(255,255,255,0.5)}50%{box-shadow:0 0 24px rgba(255,255,255,0.8)}}
-        @keyframes rainbowGlow{0%{box-shadow:0 0 25px red}25%{box-shadow:0 0 25px yellow}50%{box-shadow:0 0 25px lime}75%{box-shadow:0 0 25px cyan}100%{box-shadow:0 0 25px red}}
-        .inv-emoji{font-size:24px;display:block}
-        .inv-name{font-size:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .inv-item.lvl-1{box-shadow:0 0 6px rgba(255,255,255,0.25)}
+        .inv-item.lvl-5{box-shadow:0 0 10px rgba(255,255,255,0.4)}
+        .inv-item.lvl-10{box-shadow:0 0 16px rgba(255,255,255,0.55);animation:glowLvl 3s infinite}
+        .inv-item.lvl-15{box-shadow:0 0 24px rgba(255,255,255,0.7);animation:glowLvl 2s infinite}
+        .inv-item.lvl-20{box-shadow:0 0 32px rgba(255,255,255,0.9);animation:rainbowGlow 3s infinite;border-width:3px;border-image:linear-gradient(45deg,red,orange,yellow,lime,cyan,blue,magenta,red) 1}
+        @keyframes glowLvl{0%,100%{box-shadow:0 0 16px rgba(255,255,255,0.55)}50%{box-shadow:0 0 26px rgba(255,255,255,0.8)}}
+        @keyframes rainbowGlow{0%{box-shadow:0 0 28px red}25%{box-shadow:0 0 28px yellow}50%{box-shadow:0 0 28px lime}75%{box-shadow:0 0 28px cyan}100%{box-shadow:0 0 28px red}}
+        .inv-emoji{font-size:26px;display:block}
+        .inv-name{font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .inv-lvl{font-size:7px;color:#ffd700}
         .inv-income{font-size:7px;color:#ffaa00}
+        .inv-count-badge{position:absolute;top:-4px;right:-4px;background:#ff00ff;color:#fff;border-radius:50%;width:18px;height:18px;font-size:9px;line-height:18px;text-align:center}
 
-        /* АНИМАЦИИ БРЕЙНРОТОВ ПО РЕДКОСТИ */
-        .rarity-chrome .inv-emoji{animation:chromeShake 0.8s infinite}
+        /* АНИМАЦИИ БРЕЙНРОТОВ — ЗАМЕДЛЕННЫЕ */
+        .rarity-chrome .inv-emoji{animation:chromeShake 2s infinite}
         @keyframes chromeShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-2px)}}
-        .rarity-common .inv-emoji{animation:commonBounce 1s infinite}
-        @keyframes commonBounce{0%,100%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-5px) scale(0.9,1.1)}50%{transform:translateY(0) scale(1.1,0.9)}70%{transform:translateY(-3px) scale(0.95,1.05)}}
-        .rarity-rare .inv-emoji{animation:rareRun 0.6s infinite}
-        @keyframes rareRun{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-4px) rotate(-5deg)}50%{transform:translate(0,0) rotate(0)}75%{transform:translate(-3px,-4px) rotate(5deg)}}
-        .rarity-epic .inv-emoji{animation:epicFloat 2s infinite}
-        @keyframes epicFloat{0%,100%{transform:translateY(0) scale(1) rotate(0)}25%{transform:translateY(-6px) scale(1.1) rotate(-5deg)}50%{transform:translateY(0) scale(1) rotate(0)}75%{transform:translateY(6px) scale(0.9) rotate(5deg)}}
-        .rarity-legendary .inv-emoji{animation:legendarySpin 3s infinite}
-        @keyframes legendarySpin{0%{transform:translateY(0) rotate(0) scale(1)}25%{transform:translateY(-5px) rotate(10deg) scale(1.15)}50%{transform:translateY(0) rotate(0) scale(1)}75%{transform:translateY(5px) rotate(-10deg) scale(0.85)}}
-        .rarity-mythic .inv-emoji{animation:mythicDance 0.5s infinite}
-        @keyframes mythicDance{0%{transform:translate(0,0) rotate(0) scale(1)}20%{transform:translate(5px,-5px) rotate(15deg) scale(1.2)}40%{transform:translate(-5px,5px) rotate(-15deg) scale(0.8)}60%{transform:translate(3px,-3px) rotate(10deg) scale(1.1)}80%{transform:translate(-3px,3px) rotate(-10deg) scale(0.9)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+        .rarity-common .inv-emoji{animation:commonBounce 2.5s infinite}
+        @keyframes commonBounce{0%,100%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-6px) scale(0.9,1.1)}50%{transform:translateY(0) scale(1.1,0.9)}70%{transform:translateY(-3px) scale(0.95,1.05)}}
+        .rarity-rare .inv-emoji{animation:rareRun 1.5s infinite}
+        @keyframes rareRun{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-5px) rotate(-5deg)}50%{transform:translate(0,0) rotate(0)}75%{transform:translate(-3px,-5px) rotate(5deg)}}
+        .rarity-epic .inv-emoji{animation:epicFloat 4s infinite}
+        @keyframes epicFloat{0%,100%{transform:translateY(0) scale(1) rotate(0)}25%{transform:translateY(-8px) scale(1.1) rotate(-5deg)}50%{transform:translateY(0) scale(1) rotate(0)}75%{transform:translateY(8px) scale(0.9) rotate(5deg)}}
+        .rarity-legendary .inv-emoji{animation:legendarySpin 5s infinite}
+        @keyframes legendarySpin{0%{transform:translateY(0) rotate(0) scale(1)}25%{transform:translateY(-6px) rotate(10deg) scale(1.15)}50%{transform:translateY(0) rotate(0) scale(1)}75%{transform:translateY(6px) rotate(-10deg) scale(0.85)}}
+        .rarity-mythic .inv-emoji{animation:mythicDance 1.2s infinite}
+        @keyframes mythicDance{0%{transform:translate(0,0) rotate(0) scale(1)}20%{transform:translate(5px,-6px) rotate(15deg) scale(1.2)}40%{transform:translate(-5px,6px) rotate(-15deg) scale(0.8)}60%{transform:translate(3px,-3px) rotate(10deg) scale(1.1)}80%{transform:translate(-3px,3px) rotate(-10deg) scale(0.9)}100%{transform:translate(0,0) rotate(0) scale(1)}}
 
         .upgrade-box{background:rgba(255,215,0,0.05);border-radius:10px;padding:10px;margin:6px 0;border:2px solid #555;text-align:left}
         .upgrade-box .upg-header{display:flex;align-items:center;gap:6px}
-        .upgrade-box .upg-emoji{font-size:30px;animation:upgIdle 1s infinite}
+        .upgrade-box .upg-emoji{font-size:30px;animation:upgIdle 2s infinite}
         @keyframes upgIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
         .upgrade-box .upg-info{flex:1;font-size:10px}
         .upgrade-box .upg-cost{color:#ffaa00;font-size:11px;margin:6px 0}
@@ -94,7 +95,7 @@
         .craft-box{background:rgba(255,170,0,0.05);border-radius:10px;padding:10px;margin:6px 0;border:2px solid rgba(255,170,0,0.3)}
         .craft-slots{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;min-height:40px;margin:6px 0}
         .craft-slot{width:40px;height:40px;border:2px dashed #444;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#444}
-        .craft-slot.filled{border-color:#ffaa00;background:rgba(255,170,0,0.1);animation:slotBounce 0.5s infinite}
+        .craft-slot.filled{border-color:#ffaa00;background:rgba(255,170,0,0.1);animation:slotBounce 1.5s infinite}
         @keyframes slotBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
         .craft-chances{display:flex;justify-content:space-around;margin:4px 0;font-size:8px;color:#888}
         .btn-craft{background:linear-gradient(45deg,#ffaa00,#ff6600);color:#000;border:none;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;width:100%;font-family:monospace;font-weight:bold}
@@ -147,6 +148,7 @@
 
         <div class="tab-content" id="tab-inv">
             <h3 style="color:#00ffff;margin:8px 0;font-size:15px">📦 Инвентарь</h3>
+            <p style="color:#888;font-size:9px">Пачки — непрокачанные | Отдельно — прокачанные</p>
             <div class="inv-grid" id="inventory"></div>
         </div>
 
@@ -355,21 +357,60 @@
 
         function loadInv(){
             supabase.from('inventory').select('*').eq('player_tg_id',tgId).order('created_at',{ascending:false}).then(function(res){
-                inventory=res.data||[];
-                var html='',count=0;
-                if(inventory.length===0) html='<p style="color:#888;padding:20px">Пусто</p>';
-                else{
-                    inventory.forEach(function(i){
+                var allItems = res.data || [];
+                inventory = allItems;
+                var html = '', count = 0;
+                
+                if(allItems.length === 0) {
+                    html = '<p style="color:#888;padding:20px">Пусто</p>';
+                } else {
+                    var stacked = {};
+                    var unique = [];
+                    
+                    for(var i = 0; i < allItems.length; i++) {
+                        var item = allItems[i];
+                        if(item.upgrade_level === 0) {
+                            if(!stacked[item.item_id]) {
+                                stacked[item.item_id] = {count:0, emoji:item.emoji, name:item.item_name, rarity:item.rarity};
+                            }
+                            stacked[item.item_id].count++;
+                        } else {
+                            unique.push(item);
+                        }
+                    }
+                    
+                    var keys = Object.keys(stacked);
+                    for(var k = 0; k < keys.length; k++) {
+                        var s = stacked[keys[k]];
+                        count += s.count;
+                        html += '<div class="inv-item rarity-' + s.rarity + '" onclick="selectForCraft(\'' + keys[k] + '\',\'' + s.name + '\',\'' + s.emoji + '\')">';
+                        html += '<span class="inv-emoji">' + s.emoji + '</span>';
+                        html += '<span class="inv-name">' + s.name + '</span>';
+                        html += '<span class="inv-lvl">x' + s.count + '</span>';
+                        html += '<span class="inv-income">+' + baseIncome[s.rarity] + '/м</span>';
+                        if(s.count >= 10) html += '<div class="inv-count-badge">10+</div>';
+                        html += '</div>';
+                    }
+                    
+                    for(var u = 0; u < unique.length; u++) {
+                        var i = unique[u];
                         count++;
-                        var lvl=i.upgrade_level||0;
-                        var lvlClass=getLvlClass(lvl);
-                        var income=getItemIncome(i);
-                        html+='<div class="inv-item rarity-'+i.rarity+' '+lvlClass+'" onclick="selectForCraft(\''+i.item_id+'\',\''+i.item_name+'\',\''+i.emoji+'\')" id="inv-'+i.id+'"><span class="inv-emoji">'+i.emoji+'</span><span class="inv-name">'+i.item_name+'</span><span class="inv-lvl">Ур.'+lvl+'</span><span class="inv-income">+'+income+'/м</span></div>';
-                    });
+                        var lvl = i.upgrade_level || 0;
+                        var lvlClass = getLvlClass(lvl);
+                        var income = getItemIncome(i);
+                        html += '<div class="inv-item rarity-' + i.rarity + ' ' + lvlClass + '" id="inv-' + i.id + '">';
+                        html += '<span class="inv-emoji">' + i.emoji + '</span>';
+                        html += '<span class="inv-name">' + i.item_name + '</span>';
+                        html += '<span class="inv-lvl">Ур.' + lvl + '</span>';
+                        html += '<span class="inv-income">+' + income + '/м</span>';
+                        html += '</div>';
+                    }
                 }
-                document.getElementById('inventory').innerHTML=html;
-                document.getElementById('totalItems').innerText=count;
-                updateCraftUI();updateUI();
+                
+                document.getElementById('inventory').innerHTML = html;
+                document.getElementById('totalItems').innerText = count;
+                updateCraftUI();
+                updateUI();
             });
         }
 
@@ -412,8 +453,8 @@
 
         function selectForCraft(itemId,itemName,emoji){
             var countSame=0;
-            for(var i=0;i<inventory.length;i++){if(inventory[i].item_id===itemId) countSame++;}
-            if(countSame<10){alert('Нужно 10 одинаковых! У тебя '+countSame+' шт.');return;}
+            for(var i=0;i<inventory.length;i++){if(inventory[i].item_id===itemId && inventory[i].upgrade_level===0) countSame++;}
+            if(countSame<10){alert('Нужно 10 одинаковых непрокачанных! У тебя '+countSame+' шт.');return;}
             var allItems=document.querySelectorAll('.inv-item');
             for(var j=0;j<allItems.length;j++) allItems[j].classList.remove('selected');
             craftSelected=itemId;craftItem={id:itemId,name:itemName,emoji:emoji};
@@ -434,9 +475,9 @@
         function doCraft(){
             if(!craftSelected) return;
             var btn=document.getElementById('craftButton');btn.disabled=true;btn.innerText='⏳ Крафтим...';
-            supabase.from('inventory').select('id').eq('player_tg_id',tgId).eq('item_id',craftSelected).limit(10).then(function(res){
+            supabase.from('inventory').select('id').eq('player_tg_id',tgId).eq('item_id',craftSelected).eq('upgrade_level',0).limit(10).then(function(res){
                 var ids=(res.data||[]).map(function(r){return r.id});
-                if(ids.length<10){alert('Недостаточно!');btn.disabled=false;updateCraftUI();return;}
+                if(ids.length<10){alert('Недостаточно непрокачанных!');btn.disabled=false;updateCraftUI();return;}
                 var promises=[];
                 for(var i=0;i<ids.length;i++){promises.push(supabase.from('inventory').delete().eq('id',ids[i]))};
                 Promise.all(promises).then(function(){
