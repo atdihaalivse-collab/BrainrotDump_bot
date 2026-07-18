@@ -111,6 +111,7 @@
 
         // === ЗАГРУЗКА ===
         async function init() {
+            document.getElementById('username').innerText = '⚡ ' + playerName;
             try {
                 let { data: p, error } = await supabase.from('players').select('*').eq('tg_id', tgId).single();
                 if (error && error.code !== 'PGRST116') { console.log('DB error:', error.message); }
@@ -153,7 +154,6 @@
             const ranks = ['chrome','common','rare','epic','legendary','mythic'];
             if (ranks.indexOf(item.rarity) > ranks.indexOf(bestRarity)) bestRarity = item.rarity;
 
-            // Сохраняем
             try {
                 await supabase.from('players').upsert({ tg_id: tgId, username: playerName, total_opens: totalOpens, pity_counter: pity, best_rarity: bestRarity });
                 let { data: ex } = await supabase.from('inventory').select('*').eq('player_tg_id', tgId).eq('item_id', item.id).single();
@@ -163,7 +163,6 @@
                 console.log('Save error:', e);
             }
 
-            // Анимация
             document.body.classList.add('shake');
             setTimeout(() => document.body.classList.remove('shake'), 500);
             document.getElementById('result').innerHTML = `<span class="result-emoji">${item.emoji}</span><br><span class="result-rarity" style="color:${item.color}">${item.rarity}</span><br>${item.name}`;
@@ -194,9 +193,9 @@
 
         // === ТРЕЙДЫ ===
         async function sendTrade() {
-            let to = parseInt(document.getElementById('tradeTo').value);
-            let my = document.getElementById('tradeMy').value.trim();
-            let their = document.getElementById('tradeTheir').value.trim();
+            var to = parseInt(document.getElementById('tradeTo').value);
+            var my = document.getElementById('tradeMy').value.trim();
+            var their = document.getElementById('tradeTheir').value.trim();
             if (!to || !my || !their) { alert('Заполни все поля'); return; }
             try {
                 await supabase.from('trades').insert({ from_tg_id: tgId, to_tg_id: to, from_item_id: my, to_item_id: their, status: 'pending' });
@@ -209,12 +208,12 @@
 
         async function loadTrades() {
             try {
-                let { data: trades } = await supabase.from('trades').select('*').eq('to_tg_id', tgId).eq('status', 'pending');
-                let html = '<p style="color:#888;font-size:13px">⏳ Входящие предложения:</p>';
+                var { data: trades } = await supabase.from('trades').select('*').eq('to_tg_id', tgId).eq('status', 'pending');
+                var html = '<p style="color:#888;font-size:13px">⏳ Входящие предложения:</p>';
                 if (!trades || trades.length === 0) html += '<p style="color:#666">Нет активных трейдов</p>';
                 else {
-                    trades.forEach(t => {
-                        html += `<div class="trade-card">От <b>${t.from_tg_id}</b><br>📤 ${t.from_item_id}<br>📥 ${t.to_item_id}<br><button class="accept-btn" onclick="acceptTrade(${t.id})">Принять</button><button class="reject-btn" onclick="rejectTrade(${t.id})">Отклонить</button></div>`;
+                    trades.forEach(function(t) {
+                        html += '<div class="trade-card">От <b>' + t.from_tg_id + '</b><br>📤 ' + t.from_item_id + '<br>📥 ' + t.to_item_id + '<br><button class="accept-btn" onclick="acceptTrade(' + t.id + ')">Принять</button><button class="reject-btn" onclick="rejectTrade(' + t.id + ')">Отклонить</button></div>';
                     });
                 }
                 document.getElementById('tradesList').innerHTML = html;
@@ -238,16 +237,20 @@
 
         // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
         function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + t).classList.add('active');
-            document.getElementById('tabBtn-' + t).classList.add('active');
+            var tabs = document.querySelectorAll('.tab-content');
+            for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+            var btns = document.querySelectorAll('.tab-btn');
+            for (var j = 0; j < btns.length; j++) { btns[j].classList.remove('active'); }
+            var tabEl = document.getElementById('tab-' + t);
+            if (tabEl) tabEl.classList.add('active');
+            var btnEl = document.getElementById('tabBtn-' + t);
+            if (btnEl) btnEl.classList.add('active');
             if (t === 'inv') loadInv();
             if (t === 'trade') loadTrades();
         }
 
         // === REALTIME ===
-        supabase.channel('trades').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades', filter: `to_tg_id=eq.${tgId}` }, () => loadTrades()).subscribe();
+        supabase.channel('trades').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades', filter: 'to_tg_id=eq.' + tgId }, function() { loadTrades(); }).subscribe();
 
         // === СТАРТ ===
         init();
