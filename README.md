@@ -1,6 +1,6 @@
 
 # BrainrotDump_bot
-# 🧠 Brainrot Collector
+# 🧠 BrainrotDumb
 
 Мини-игра в Telegram с коллекционированием брейнротов.
 
