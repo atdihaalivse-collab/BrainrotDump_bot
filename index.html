@@ -7,386 +7,250 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #fff; font-family: 'Courier New', monospace; min-height: 100vh; overflow-x: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px); pointer-events: none; z-index: 999; animation: scanlines 0.1s infinite; }
-        @keyframes scanlines { 0% { transform: translateY(0); } 100% { transform: translateY(4px); } }
-        .container { max-width: 400px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
-        .header { text-align: center; padding: 20px 0; }
-        .header h1 { font-size: 24px; background: linear-gradient(45deg, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: glitch 2s infinite; }
-        @keyframes glitch { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,2px)} 40%{transform:translate(2px,-2px)} 60%{transform:translate(-1px,-1px)} 80%{transform:translate(1px,1px)} }
-        .username { color: #888; font-size: 14px; margin-top: 5px; }
-        .tabs { display: flex; gap: 10px; margin: 15px 0; justify-content: center; }
-        .tab-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Courier New', monospace; }
-        .tab-btn.active { background: #ff00ff; border-color: #ff00ff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .stats { display: flex; justify-content: space-around; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.1); }
-        .stat { text-align: center; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #ff00ff; }
-        .stat-label { font-size: 10px; color: #888; margin-top: 3px; }
-        .case-section { text-align: center; margin: 30px 0; }
-        .case-btn { width: 150px; height: 150px; border-radius: 50%; border: 4px solid #ff00ff; background: radial-gradient(circle, #1a1a1a, #0a0a0a); color: #fff; font-size: 60px; cursor: pointer; box-shadow: 0 0 30px rgba(255,0,255,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{box-shadow:0 0 30px rgba(255,0,255,0.3)} 50%{box-shadow:0 0 60px rgba(255,0,255,0.6)} }
-        .case-btn:active { transform: scale(0.9); }
-        .case-label { margin-top: 10px; color: #888; font-size: 14px; }
-        .result-area { text-align: center; min-height: 100px; padding: 20px; margin: 15px 0; background: rgba(0,0,0,0.3); border-radius: 15px; }
-        .result-item { animation: dropIn 0.5s ease-out; }
-        @keyframes dropIn { 0%{transform:translateY(-50px) scale(0);opacity:0} 70%{transform:translateY(10px) scale(1.1)} 100%{transform:translateY(0) scale(1);opacity:1} }
-        .result-emoji { font-size: 70px; display: block; }
-        .result-rarity { font-size: 22px; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 3px; }
-        .shake { animation: shake 0.6s ease-in-out; }
-        @keyframes shake { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-15px,5px)} 20%{transform:translate(15px,-5px)} 30%{transform:translate(-10px,10px)} 40%{transform:translate(10px,-10px)} 50%{transform:translate(-5px,5px)} 60%{transform:translate(5px,-5px)} 70%{transform:translate(-8px,8px)} 80%{transform:translate(8px,-8px)} 90%{transform:translate(-3px,3px)} }
-        .inventory-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .inv-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; text-align: center; width: 75px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px; position: relative; }
-        .inv-emoji { font-size: 30px; }
-        .inv-count { color: #888; font-size: 10px; }
-        .inv-trade-btn { background: #ff00ff; color: #fff; border: none; border-radius: 5px; padding: 3px 8px; font-size: 9px; margin-top: 5px; cursor: pointer; font-family: 'Courier New', monospace; }
-        .rarity-chrome { border-color: #888; }
-        .rarity-common { border-color: #00ff00; }
-        .rarity-rare { border-color: #0088ff; }
-        .rarity-epic { border-color: #aa00ff; }
-        .rarity-legendary { border-color: #ffaa00; }
-        .rarity-mythic { border-color: #ff0000; }
-        .trade-form { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; margin: 15px 0; }
-        .trade-form input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 10px; font-family: 'Courier New', monospace; }
-        .trade-form button { width: 100%; padding: 12px; background: #ff00ff; color: #fff; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-family: 'Courier New', monospace; margin-top: 10px; }
-        .pending-trades { margin-top: 20px; }
-        .trade-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
-        .trade-card button { background: #00ff88; color: #000; border: none; padding: 8px 15px; border-radius: 5px; margin: 5px; cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold; }
-        .trade-card .reject-btn { background: #ff4444; color: #fff; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0a0a;color:#fff;font-family:'Courier New',monospace;min-height:100vh;text-align:center;padding:15px}
+        h1{background:linear-gradient(45deg,#ff00ff,#00ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:22px;margin:10px 0}
+        .tabs{display:flex;gap:8px;justify-content:center;margin:15px 0;flex-wrap:wrap}
+        .tab-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:10px 15px;border-radius:10px;cursor:pointer;font-family:monospace;font-size:14px}
+        .tab-btn.active{background:#ff00ff;border-color:#ff00ff}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        .stats{display:flex;justify-content:space-around;background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0}
+        .stat{text-align:center}
+        .stat-val{font-size:22px;font-weight:bold;color:#ff00ff}
+        .stat-lbl{font-size:10px;color:#888}
+        .case-btn{width:130px;height:130px;border-radius:50%;border:3px solid #ff00ff;background:radial-gradient(circle,#1a1a1a,#0a0a0a);color:#fff;font-size:55px;cursor:pointer;box-shadow:0 0 25px rgba(255,0,255,0.4);margin:20px auto;display:block;animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{box-shadow:0 0 25px rgba(255,0,255,0.4)}50%{box-shadow:0 0 50px rgba(255,0,255,0.7)}}
+        .case-btn:active{transform:scale(0.9)}
+        .result{min-height:80px;padding:15px;background:rgba(0,0,0,0.3);border-radius:15px;margin:10px 0}
+        .result-emoji{font-size:60px}
+        .result-rarity{font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px}
+        .shake{animation:shake 0.5s ease-in-out}
+        @keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-10px,5px)}40%{transform:translate(10px,-5px)}60%{transform:translate(-5px,5px)}80%{transform:translate(5px,-5px)}}
+        .inv-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+        .inv-item{background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;width:75px;border:1px solid #333;font-size:11px}
+        .inv-emoji{font-size:28px}
+        .trade-box{background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0}
+        .trade-box input{width:100%;padding:10px;margin:5px 0;background:#111;border:1px solid #333;color:#fff;border-radius:10px;font-family:monospace}
+        .btn{background:#ff00ff;color:#fff;border:none;padding:12px;border-radius:10px;font-size:16px;cursor:pointer;font-family:monospace;width:100%;margin-top:10px}
+        .trade-card{background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin:8px 0;border:1px solid #333;font-size:13px;text-align:left}
+        .trade-card button{padding:6px 12px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin:3px}
+        .accept-btn{background:#00ff88;color:#000}
+        .reject-btn{background:#ff4444;color:#fff}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🧠 Brainrot Collector</h1>
-            <p class="username" id="username">Загрузка...</p>
+    <h1>🧠 Brainrot Collector</h1>
+    <p id="username" style="color:#888;font-size:13px">Загрузка...</p>
+    <p style="color:#666;font-size:10px">Твой Telegram ID: <span id="myId"></span></p>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="tabBtn-case" onclick="switchTab('case')">🎁 Кейсы</button>
+        <button class="tab-btn" id="tabBtn-inv" onclick="switchTab('inv')">📦 Инвентарь</button>
+        <button class="tab-btn" id="tabBtn-trade" onclick="switchTab('trade')">🔄 Обмен</button>
+    </div>
+
+    <div class="tab-content active" id="tab-case">
+        <div class="stats">
+            <div class="stat"><div class="stat-val" id="opens">0</div><div class="stat-lbl">Открытий</div></div>
+            <div class="stat"><div class="stat-val" id="pity">10</div><div class="stat-lbl">До гаранта</div></div>
+            <div class="stat"><div class="stat-val" id="best">-</div><div class="stat-lbl">Лучший</div></div>
         </div>
+        <button class="case-btn" onclick="openCase()">🎁</button>
+        <p style="color:#888;font-size:13px">Жми на кейс!</p>
+        <div class="result" id="result">Тут появится твой дроп</div>
+    </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('case')">🎁 Кейсы</button>
-            <button class="tab-btn" onclick="switchTab('inventory')">📦 Инвентарь</button>
-            <button class="tab-btn" onclick="switchTab('trade')">🔄 Обмен</button>
+    <div class="tab-content" id="tab-inv">
+        <h3 style="color:#00ffff;margin:10px 0">📦 Твой инвентарь</h3>
+        <div class="inv-grid" id="inventory"></div>
+    </div>
+
+    <div class="tab-content" id="tab-trade">
+        <h3 style="color:#00ffff;margin:10px 0">🔄 Обмен</h3>
+        <div class="trade-box">
+            <p style="text-align:left;color:#888;font-size:12px">📤 Предложить обмен:</p>
+            <input type="number" id="tradeTo" placeholder="Telegram ID игрока">
+            <input type="text" id="tradeMy" placeholder="Твой предмет (ID)">
+            <input type="text" id="tradeTheir" placeholder="Хочешь получить (ID)">
+            <button class="btn" onclick="sendTrade()">🚀 Отправить</button>
         </div>
-
-        <!-- Вкладка кейсов -->
-        <div class="tab-content active" id="tab-case">
-            <div class="stats">
-                <div class="stat"><div class="stat-value" id="total-opens">0</div><div class="stat-label">Открытий</div></div>
-                <div class="stat"><div class="stat-value" id="pity-count">0</div><div class="stat-label">До гаранта</div></div>
-                <div class="stat"><div class="stat-value" id="best-rarity">-</div><div class="stat-label">Лучший дроп</div></div>
-            </div>
-            <div class="case-section">
-                <button class="case-btn" id="caseButton" onclick="openCase()">🎁</button>
-                <p class="case-label">Нажми, чтобы открыть Кейс Кринжа</p>
-            </div>
-            <div class="result-area" id="resultArea"><p style="color:#888;">Жми на кейс, Сигма</p></div>
-        </div>
-
-        <!-- Вкладка инвентаря -->
-        <div class="tab-content" id="tab-inventory">
-            <h3 style="text-align:center;color:#00ffff;margin-bottom:15px;">📦 Твой инвентарь</h3>
-            <div class="inventory-grid" id="inventoryGrid"></div>
-        </div>
-
-        <!-- Вкладка обмена -->
-        <div class="tab-content" id="tab-trade">
-            <h3 style="text-align:center;color:#00ffff;margin-bottom:15px;">🔄 Обмен с игроками</h3>
-            
-            <div class="trade-form">
-                <h4 style="margin-bottom:10px;">📤 Предложить обмен</h4>
-                <input type="text" id="trade-tg-id" placeholder="Telegram ID игрока (цифры)">
-                <input type="text" id="trade-my-item" placeholder="ID предмета (например: skibidi)">
-                <input type="text" id="trade-their-item" placeholder="Что хочешь взамен (ID предмета)">
-                <button onclick="sendTrade()">🚀 Отправить предложение</button>
-            </div>
-
-            <div class="pending-trades" id="pendingTrades">
-                <h4 style="margin-bottom:10px;">⏳ Ожидают ответа</h4>
-                <p style="color:#888;" id="no-trades">Нет активных трейдов</p>
-            </div>
+        <div id="tradesList">
+            <p style="color:#888;font-size:13px">⏳ Входящие предложения:</p>
+            <p style="color:#666" id="noTrades">Нет активных трейдов</p>
         </div>
     </div>
 
     <script>
-        // ========== КОНФИГУРАЦИЯ SUPABASE ==========
-        // ЗАМЕНИ ЭТИ СТРОКИ НА СВОИ ДАННЫЕ ИЗ SUPABASE!
+        // === SUPABASE ===
         const SUPABASE_URL = 'https://qcpueprjlfuntfwqiboo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcHVlcHJqbGZ1bnRmd3FpYm9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjgyNTksImV4cCI6MjA5OTk0NDI1OX0.UxJbESuV5jenQcVC9cUXX9qz9_NEVd9PrR_4Q-df618';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ========== TELEGRAM ==========
-        const tg = window.Telegram.WebApp;
+        // === TELEGRAM ===
+        const tg = Telegram.WebApp;
         tg.ready();
         tg.expand();
 
         const tgId = tg.initDataUnsafe?.user?.id || 12345;
-        const playerName = tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || 'Анонимный Сигма';
-        document.getElementById('username').innerText = '⚡ ' + playerName + ' (ID: ' + tgId + ')';
+        const playerName = tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || 'Сигма';
+        document.getElementById('username').innerText = '⚡ ' + playerName;
+        document.getElementById('myId').innerText = tgId;
 
-        // ========== ДАННЫЕ ПРЕДМЕТОВ ==========
+        // === ПРЕДМЕТЫ ===
         const items = [
-            { id: 'skibidi', name: 'Скибиди Туалет', rarity: 'chrome', emoji: '🚽', chance: 60, color: '#888' },
-            { id: 'sigma', name: 'Сигма-бой', rarity: 'chrome', emoji: '🗿', chance: 60, color: '#888' },
-            { id: 'gigachad', name: 'Гигачад', rarity: 'common', emoji: '💪', chance: 25, color: '#00ff00' },
-            { id: 'oguzok', name: 'Огузок', rarity: 'common', emoji: '🍑', chance: 25, color: '#00ff00' },
-            { id: 'mamkin', name: 'Мамкин Найн', rarity: 'rare', emoji: '⚔️', chance: 10, color: '#0088ff' },
-            { id: 'quad', name: 'Квадробикер', rarity: 'rare', emoji: '🦘', chance: 10, color: '#0088ff' },
-            { id: 'cybercat', name: 'Кибер-Кот', rarity: 'epic', emoji: '🐱', chance: 3.9, color: '#aa00ff' },
-            { id: 'npc', name: 'NPC-Стример', rarity: 'epic', emoji: '🤖', chance: 3.9, color: '#aa00ff' },
-            { id: 'minecraft', name: 'Майнкрафт Ситуация', rarity: 'legendary', emoji: '⛏️', chance: 1, color: '#ffaa00' },
-            { id: 'altushka', name: 'Альтушка с Госуслуг', rarity: 'legendary', emoji: '👩‍💻', chance: 1, color: '#ffaa00' },
-            { id: 'shaman', name: 'Зумер-Шаман', rarity: 'mythic', emoji: '👽', chance: 0.1, color: '#ff0000' }
+            {id:'skibidi',name:'Скибиди Туалет',rarity:'chrome',emoji:'🚽',chance:60,color:'#888'},
+            {id:'gigachad',name:'Гигачад',rarity:'common',emoji:'💪',chance:25,color:'#0f0'},
+            {id:'mamkin',name:'Мамкин Найн',rarity:'rare',emoji:'⚔️',chance:10,color:'#08f'},
+            {id:'cybercat',name:'Кибер-Кот',rarity:'epic',emoji:'🐱',chance:3.9,color:'#a0f'},
+            {id:'altushka',name:'Альтушка с Госуслуг',rarity:'legendary',emoji:'👩‍💻',chance:1,color:'#fa0'},
+            {id:'shaman',name:'Зумер-Шаман',rarity:'mythic',emoji:'👽',chance:0.1,color:'#f00'}
         ];
 
-        let gameData = { totalOpens: 0, pityCounter: 0, bestRarity: 'none', inventory: [] };
+        let totalOpens = 0, pity = 0, bestRarity = 'none';
 
-        // ========== ЗАГРУЗКА ДАННЫХ ИГРОКА ИЗ SUPABASE ==========
-        async function loadPlayer() {
-            // Ищем игрока
-            let { data: player } = await supabase
-                .from('players')
-                .select('*')
-                .eq('tg_id', tgId)
-                .single();
-
-            // Если нет - создаём
-            if (!player) {
-                await supabase.from('players').insert({ tg_id: tgId, username: playerName });
-                player = { total_opens: 0, pity_counter: 0, best_rarity: 'none' };
+        // === ЗАГРУЗКА ===
+        async function init() {
+            try {
+                let { data: p, error } = await supabase.from('players').select('*').eq('tg_id', tgId).single();
+                if (error && error.code !== 'PGRST116') { console.log('DB error:', error.message); }
+                if (!p) {
+                    await supabase.from('players').insert({ tg_id: tgId, username: playerName });
+                    p = { total_opens: 0, pity_counter: 0, best_rarity: 'none' };
+                }
+                totalOpens = p.total_opens || 0;
+                pity = p.pity_counter || 0;
+                bestRarity = p.best_rarity || 'none';
+            } catch(e) {
+                console.log('Init error:', e);
             }
-
-            gameData.totalOpens = player.total_opens;
-            gameData.pityCounter = player.pity_counter;
-            gameData.bestRarity = player.best_rarity;
-
-            // Загружаем инвентарь
-            let { data: inv } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('player_tg_id', tgId);
-            
-            gameData.inventory = inv || [];
-
-            updateStats();
-            renderInventory();
-            loadPendingTrades();
+            updateUI();
+            loadInv();
+            loadTrades();
         }
 
-        // ========== СОХРАНЕНИЕ ИГРОКА ==========
-        async function savePlayer() {
-            await supabase
-                .from('players')
-                .upsert({
-                    tg_id: tgId,
-                    username: playerName,
-                    total_opens: gameData.totalOpens,
-                    pity_counter: gameData.pityCounter,
-                    best_rarity: gameData.bestRarity
-                });
+        function updateUI() {
+            document.getElementById('opens').innerText = totalOpens;
+            document.getElementById('pity').innerText = Math.max(0, 10 - pity);
+            const bm = { 'none': '-', 'chrome': '🚽', 'common': '💚', 'rare': '💙', 'epic': '💜', 'legendary': '🧡', 'mythic': '❤️' };
+            document.getElementById('best').innerText = bm[bestRarity] || '-';
         }
 
-        // ========== ОТКРЫТИЕ КЕЙСА ==========
-        function getRandomItem() {
-            const roll = Math.random() * 100;
-            let cumulative = 0;
-            if (gameData.pityCounter >= 10) {
-                const rarePlus = items.filter(i => ['rare', 'epic', 'legendary', 'mythic'].includes(i.rarity));
-                return rarePlus[Math.floor(Math.random() * rarePlus.length)];
-            }
-            for (const item of items) {
-                cumulative += item.chance;
-                if (roll <= cumulative) return item;
-            }
-            return items[0];
-        }
-
+        // === ОТКРЫТИЕ КЕЙСА ===
         async function openCase() {
-            const item = getRandomItem();
-            gameData.totalOpens++;
-            
-            if (['epic', 'legendary', 'mythic', 'rare'].includes(item.rarity)) {
-                gameData.pityCounter = 0;
+            let item;
+            if (pity >= 10) {
+                const rp = items.filter(i => ['rare','epic','legendary','mythic'].includes(i.rarity));
+                item = rp[Math.floor(Math.random() * rp.length)];
             } else {
-                gameData.pityCounter++;
+                let roll = Math.random() * 100, cum = 0;
+                for (let i of items) { cum += i.chance; if (roll <= cum) { item = i; break; } }
+                if (!item) item = items[0];
             }
 
-            const rarityRank = ['chrome', 'common', 'rare', 'epic', 'legendary', 'mythic'];
-            if (rarityRank.indexOf(item.rarity) > rarityRank.indexOf(gameData.bestRarity)) {
-                gameData.bestRarity = item.rarity;
+            totalOpens++;
+            pity = ['epic','legendary','mythic','rare'].includes(item.rarity) ? 0 : pity + 1;
+            const ranks = ['chrome','common','rare','epic','legendary','mythic'];
+            if (ranks.indexOf(item.rarity) > ranks.indexOf(bestRarity)) bestRarity = item.rarity;
+
+            // Сохраняем
+            try {
+                await supabase.from('players').upsert({ tg_id: tgId, username: playerName, total_opens: totalOpens, pity_counter: pity, best_rarity: bestRarity });
+                let { data: ex } = await supabase.from('inventory').select('*').eq('player_tg_id', tgId).eq('item_id', item.id).single();
+                if (ex) await supabase.from('inventory').update({ count: ex.count + 1 }).eq('id', ex.id);
+                else await supabase.from('inventory').insert({ player_tg_id: tgId, item_id: item.id, item_name: item.name, rarity: item.rarity, emoji: item.emoji, count: 1 });
+            } catch(e) {
+                console.log('Save error:', e);
             }
-
-            // Сохраняем игрока
-            await savePlayer();
-
-            // Добавляем предмет в инвентарь
-            let { data: existing } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('player_tg_id', tgId)
-                .eq('item_id', item.id)
-                .single();
-
-            if (existing) {
-                await supabase
-                    .from('inventory')
-                    .update({ count: existing.count + 1 })
-                    .eq('id', existing.id);
-            } else {
-                await supabase
-                    .from('inventory')
-                    .insert({
-                        player_tg_id: tgId,
-                        item_id: item.id,
-                        item_name: item.name,
-                        rarity: item.rarity,
-                        emoji: item.emoji,
-                        count: 1
-                    });
-            }
-
-            // Перезагружаем инвентарь
-            let { data: inv } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('player_tg_id', tgId);
-            gameData.inventory = inv || [];
 
             // Анимация
-            document.querySelector('.container').classList.add('shake');
-            setTimeout(() => document.querySelector('.container').classList.remove('shake'), 600);
-
-            document.getElementById('resultArea').innerHTML = `
-                <div class="result-item">
-                    <span class="result-emoji">${item.emoji}</span>
-                    <div class="result-rarity" style="color:${item.color}">${item.rarity.toUpperCase()}</div>
-                    <div style="font-size:20px;">${item.name}</div>
-                </div>`;
-
-            if (['legendary', 'mythic'].includes(item.rarity)) {
+            document.body.classList.add('shake');
+            setTimeout(() => document.body.classList.remove('shake'), 500);
+            document.getElementById('result').innerHTML = `<span class="result-emoji">${item.emoji}</span><br><span class="result-rarity" style="color:${item.color}">${item.rarity}</span><br>${item.name}`;
+            
+            if (['legendary','mythic'].includes(item.rarity)) {
                 document.body.style.background = item.rarity === 'mythic' ? '#1a0000' : '#1a0f00';
-                setTimeout(() => document.body.style.background = '#0a0a0a', 1000);
+                setTimeout(() => document.body.style.background = '#0a0a0a', 1500);
             }
 
-            updateStats();
-            renderInventory();
+            updateUI();
+            loadInv();
         }
 
-        // ========== ОТПРАВКА ТРЕЙДА ==========
+        // === ИНВЕНТАРЬ ===
+        async function loadInv() {
+            try {
+                let { data: inv } = await supabase.from('inventory').select('*').eq('player_tg_id', tgId);
+                let html = '';
+                if (!inv || inv.length === 0) html = '<p style="color:#888">Пусто. Открой кейс!</p>';
+                else {
+                    inv.forEach(i => {
+                        html += `<div class="inv-item" style="border-color:${i.rarity==='chrome'?'#888':i.rarity==='common'?'#0f0':i.rarity==='rare'?'#08f':i.rarity==='epic'?'#a0f':i.rarity==='legendary'?'#fa0':'#f00'}"><div class="inv-emoji">${i.emoji}</div>${i.item_name}<br><small>x${i.count}</small><br><small style="color:#666">ID:${i.item_id}</small></div>`;
+                    });
+                }
+                document.getElementById('inventory').innerHTML = html;
+            } catch(e) { console.log('Inv error:', e); }
+        }
+
+        // === ТРЕЙДЫ ===
         async function sendTrade() {
-            const toTgId = parseInt(document.getElementById('trade-tg-id').value);
-            const myItem = document.getElementById('trade-my-item').value;
-            const theirItem = document.getElementById('trade-their-item').value;
-
-            if (!toTgId || !myItem || !theirItem) {
-                alert('Заполни все поля!');
-                return;
-            }
-
-            const { error } = await supabase
-                .from('trades')
-                .insert({
-                    from_tg_id: tgId,
-                    to_tg_id: toTgId,
-                    from_item_id: myItem,
-                    to_item_id: theirItem,
-                    status: 'pending'
-                });
-
-            if (error) {
-                alert('Ошибка: ' + error.message);
-            } else {
-                alert('Предложение отправлено! Игрок увидит его в своём разделе обмена.');
-                document.getElementById('trade-tg-id').value = '';
-                document.getElementById('trade-my-item').value = '';
-                document.getElementById('trade-their-item').value = '';
-            }
+            let to = parseInt(document.getElementById('tradeTo').value);
+            let my = document.getElementById('tradeMy').value.trim();
+            let their = document.getElementById('tradeTheir').value.trim();
+            if (!to || !my || !their) { alert('Заполни все поля'); return; }
+            try {
+                await supabase.from('trades').insert({ from_tg_id: tgId, to_tg_id: to, from_item_id: my, to_item_id: their, status: 'pending' });
+                alert('Предложение отправлено!');
+                document.getElementById('tradeTo').value = '';
+                document.getElementById('tradeMy').value = '';
+                document.getElementById('tradeTheir').value = '';
+            } catch(e) { alert('Ошибка: ' + e.message); }
         }
 
-        // ========== ЗАГРУЗКА ВХОДЯЩИХ ТРЕЙДОВ ==========
-        async function loadPendingTrades() {
-            let { data: trades } = await supabase
-                .from('trades')
-                .select('*')
-                .eq('to_tg_id', tgId)
-                .eq('status', 'pending');
-
-            const container = document.getElementById('pendingTrades');
-            
-            if (!trades || trades.length === 0) {
-                document.getElementById('no-trades').style.display = 'block';
-                return;
-            }
-
-            document.getElementById('no-trades').style.display = 'none';
-            
-            let html = '<h4 style="margin-bottom:10px;">⏳ Входящие предложения</h4>';
-            trades.forEach(trade => {
-                html += `
-                    <div class="trade-card">
-                        <p>🎁 Игрок ${trade.from_tg_id} предлагает:</p>
-                        <p>📤 Отдаёт: <b>${trade.from_item_id}</b></p>
-                        <p>📥 Хочет: <b>${trade.to_item_id}</b></p>
-                        <button onclick="acceptTrade(${trade.id})">✅ Принять</button>
-                        <button class="reject-btn" onclick="rejectTrade(${trade.id})">❌ Отклонить</button>
-                    </div>`;
-            });
-            
-            // Убираем старый заголовок если он уже есть
-            const existingTitle = container.querySelector('h4');
-            if (!existingTitle) {
-                container.innerHTML = html;
-            } else {
-                // Оставляем только новые карточки
-                const cards = container.querySelectorAll('.trade-card');
-                cards.forEach(c => c.remove());
-                container.innerHTML += html;
-            }
+        async function loadTrades() {
+            try {
+                let { data: trades } = await supabase.from('trades').select('*').eq('to_tg_id', tgId).eq('status', 'pending');
+                let html = '<p style="color:#888;font-size:13px">⏳ Входящие предложения:</p>';
+                if (!trades || trades.length === 0) html += '<p style="color:#666">Нет активных трейдов</p>';
+                else {
+                    trades.forEach(t => {
+                        html += `<div class="trade-card">От <b>${t.from_tg_id}</b><br>📤 ${t.from_item_id}<br>📥 ${t.to_item_id}<br><button class="accept-btn" onclick="acceptTrade(${t.id})">Принять</button><button class="reject-btn" onclick="rejectTrade(${t.id})">Отклонить</button></div>`;
+                    });
+                }
+                document.getElementById('tradesList').innerHTML = html;
+            } catch(e) { console.log('Trades error:', e); }
         }
 
-        // ========== ПРИНЯТИЕ ТРЕЙДА ==========
-        async function acceptTrade(tradeId) {
-            // Получаем данные трейда
-            const { data: trade } = await supabase
-                .from('trades')
-                .select('*')
-                .eq('id', tradeId)
-                .single();
-
-            if (!trade) return;
-
-            // Меняем предметы местами (очень упрощённо)
-            // В реальной версии здесь нужно больше проверок
-            
-            await supabase
-                .from('trades')
-                .update({ status: 'accepted' })
-                .eq('id', tradeId);
-
-            alert('Обмен совершён! (В тестовой версии предметы пока не переносятся автоматически)');
-            loadPendingTrades();
-            renderInventory();
+        async function acceptTrade(id) {
+            try {
+                await supabase.from('trades').update({ status: 'accepted' }).eq('id', id);
+                alert('Обмен принят!');
+                loadTrades();
+            } catch(e) { alert('Ошибка'); }
         }
 
-        async function rejectTrade(tradeId) {
-            await supabase
-                .from('trades')
-                .update({ status: 'rejected' })
-                .eq('id', tradeId);
-            
-            loadPendingTrades();
+        async function rejectTrade(id) {
+            try {
+                await supabase.from('trades').update({ status: 'rejected' }).eq('id', id);
+                loadTrades();
+            } catch(e) { alert('Ошибка'); }
         }
 
-        // ========== ОТОБРАЖЕНИЕ ==========
-        function updateStats() {
-            document.getElementById('total-opens').innerText = gameData.totalOpens;
-            document.getElementById('pity-count').innerText = 10 - gameData.pityCounter;
-            const bestMap = { 'none': '-', 'chrome': '🚽', 'common': '💚', 'rare': '💙', 'epic': '💜', 'legendary': '🧡', 'mythic': '❤️' };
-            document.getElementById('best-rarity').innerText = bestMap[gameData.be
-// ========== ЗАПУСК ==========
-loadPlayer().catch(err => {
-    console.error('❌ Ошибка загрузки:', err);
-    document.getElementById('username').innerText = '⚠️ Ошибка подключения';
-});
+        // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
+        function switchTab(t) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + t).classList.add('active');
+            document.getElementById('tabBtn-' + t).classList.add('active');
+            if (t === 'inv') loadInv();
+            if (t === 'trade') loadTrades();
+        }
+
+        // === REALTIME ===
+        supabase.channel('trades').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades', filter: `to_tg_id=eq.${tgId}` }, () => loadTrades()).subscribe();
+
+        // === СТАРТ ===
+        init();
+    </script>
+</body>
+</html>
