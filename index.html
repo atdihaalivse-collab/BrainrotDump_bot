@@ -5,251 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Brainrot Collector</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0a0a;
-            color: #fff;
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Эффект помех на фоне */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.1) 2px,
-                    rgba(0, 0, 0, 0.1) 4px);
-            pointer-events: none;
-            z-index: 999;
-            animation: scanlines 0.1s infinite;
-        }
-
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(4px); }
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Шапка */
-        .header {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: none;
-            animation: glitch 2s infinite;
-        }
-
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(2px, -2px); }
-            60% { transform: translate(-1px, -1px); }
-            80% { transform: translate(1px, 1px); }
-        }
-
-        .username {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        /* Счётчик */
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff00ff;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: #888;
-            margin-top: 3px;
-        }
-
-        /* Кнопка открытия */
-        .case-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .case-btn {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 4px solid #ff00ff;
-            background: radial-gradient(circle, #1a1a1a, #0a0a0a);
-            color: #fff;
-            font-size: 60px;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1);
-            transition: all 0.3s;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.3); }
-            50% { box-shadow: 0 0 60px rgba(255, 0, 255, 0.6); }
-        }
-
-        .case-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 0 80px rgba(255, 0, 255, 0.8);
-        }
-
-        .case-label {
-            margin-top: 10px;
-            color: #888;
-            font-size: 14px;
-        }
-
-        /* Результат */
-        .result-area {
-            text-align: center;
-            min-height: 120px;
-            padding: 20px;
-            margin: 15px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .result-item {
-            animation: dropIn 0.5s ease-out;
-        }
-
-        @keyframes dropIn {
-            0% {
-                transform: translateY(-50px) scale(0);
-                opacity: 0;
-            }
-            70% {
-                transform: translateY(10px) scale(1.1);
-            }
-            100% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        .result-emoji {
-            font-size: 70px;
-            display: block;
-        }
-
-        .result-rarity {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        /* Тряска экрана */
-        .shake {
-            animation: shake 0.6s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-15px, 5px); }
-            20% { transform: translate(15px, -5px); }
-            30% { transform: translate(-10px, 10px); }
-            40% { transform: translate(10px, -10px); }
-            50% { transform: translate(-5px, 5px); }
-            60% { transform: translate(5px, -5px); }
-            70% { transform: translate(-8px, 8px); }
-            80% { transform: translate(8px, -8px); }
-            90% { transform: translate(-3px, 3px); }
-        }
-
-        /* Инвентарь */
-        .inventory-section {
-            margin-top: 20px;
-        }
-
-        .inventory-title {
-            font-size: 18px;
-            color: #00ffff;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .inventory-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .inv-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            width: 80px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 12px;
-        }
-
-        .inv-emoji {
-            font-size: 35px;
-        }
-
-        .inv-count {
-            color: #888;
-            font-size: 10px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; color: #fff; font-family: 'Courier New', monospace; min-height: 100vh; overflow-x: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px); pointer-events: none; z-index: 999; animation: scanlines 0.1s infinite; }
+        @keyframes scanlines { 0% { transform: translateY(0); } 100% { transform: translateY(4px); } }
+        .container { max-width: 400px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+        .header { text-align: center; padding: 20px 0; }
+        .header h1 { font-size: 24px; background: linear-gradient(45deg, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: glitch 2s infinite; }
+        @keyframes glitch { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,2px)} 40%{transform:translate(2px,-2px)} 60%{transform:translate(-1px,-1px)} 80%{transform:translate(1px,1px)} }
+        .username { color: #888; font-size: 14px; margin-top: 5px; }
+        .tabs { display: flex; gap: 10px; margin: 15px 0; justify-content: center; }
+        .tab-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Courier New', monospace; }
+        .tab-btn.active { background: #ff00ff; border-color: #ff00ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .stats { display: flex; justify-content: space-around; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .stat { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #ff00ff; }
+        .stat-label { font-size: 10px; color: #888; margin-top: 3px; }
+        .case-section { text-align: center; margin: 30px 0; }
+        .case-btn { width: 150px; height: 150px; border-radius: 50%; border: 4px solid #ff00ff; background: radial-gradient(circle, #1a1a1a, #0a0a0a); color: #fff; font-size: 60px; cursor: pointer; box-shadow: 0 0 30px rgba(255,0,255,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 30px rgba(255,0,255,0.3)} 50%{box-shadow:0 0 60px rgba(255,0,255,0.6)} }
+        .case-btn:active { transform: scale(0.9); }
+        .case-label { margin-top: 10px; color: #888; font-size: 14px; }
+        .result-area { text-align: center; min-height: 100px; padding: 20px; margin: 15px 0; background: rgba(0,0,0,0.3); border-radius: 15px; }
+        .result-item { animation: dropIn 0.5s ease-out; }
+        @keyframes dropIn { 0%{transform:translateY(-50px) scale(0);opacity:0} 70%{transform:translateY(10px) scale(1.1)} 100%{transform:translateY(0) scale(1);opacity:1} }
+        .result-emoji { font-size: 70px; display: block; }
+        .result-rarity { font-size: 22px; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 3px; }
+        .shake { animation: shake 0.6s ease-in-out; }
+        @keyframes shake { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-15px,5px)} 20%{transform:translate(15px,-5px)} 30%{transform:translate(-10px,10px)} 40%{transform:translate(10px,-10px)} 50%{transform:translate(-5px,5px)} 60%{transform:translate(5px,-5px)} 70%{transform:translate(-8px,8px)} 80%{transform:translate(8px,-8px)} 90%{transform:translate(-3px,3px)} }
+        .inventory-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .inv-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; text-align: center; width: 75px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px; position: relative; }
+        .inv-emoji { font-size: 30px; }
+        .inv-count { color: #888; font-size: 10px; }
+        .inv-trade-btn { background: #ff00ff; color: #fff; border: none; border-radius: 5px; padding: 3px 8px; font-size: 9px; margin-top: 5px; cursor: pointer; font-family: 'Courier New', monospace; }
         .rarity-chrome { border-color: #888; }
         .rarity-common { border-color: #00ff00; }
         .rarity-rare { border-color: #0088ff; }
         .rarity-epic { border-color: #aa00ff; }
         .rarity-legendary { border-color: #ffaa00; }
         .rarity-mythic { border-color: #ff0000; }
+        .trade-form { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; margin: 15px 0; }
+        .trade-form input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 10px; font-family: 'Courier New', monospace; }
+        .trade-form button { width: 100%; padding: 12px; background: #ff00ff; color: #fff; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-family: 'Courier New', monospace; margin-top: 10px; }
+        .pending-trades { margin-top: 20px; }
+        .trade-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .trade-card button { background: #00ff88; color: #000; border: none; padding: 8px 15px; border-radius: 5px; margin: 5px; cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold; }
+        .trade-card .reject-btn { background: #ff4444; color: #fff; }
     </style>
 </head>
 <body>
@@ -259,47 +64,69 @@
             <p class="username" id="username">Загрузка...</p>
         </div>
 
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="total-opens">0</div>
-                <div class="stat-label">Открытий</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="pity-count">0</div>
-                <div class="stat-label">До гаранта</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="best-rarity">-</div>
-                <div class="stat-label">Лучший дроп</div>
-            </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('case')">🎁 Кейсы</button>
+            <button class="tab-btn" onclick="switchTab('inventory')">📦 Инвентарь</button>
+            <button class="tab-btn" onclick="switchTab('trade')">🔄 Обмен</button>
         </div>
 
-        <div class="case-section">
-            <button class="case-btn" id="caseButton" onclick="openCase()">🎁</button>
-            <p class="case-label">Нажми, чтобы открыть Кейс Кринжа</p>
+        <!-- Вкладка кейсов -->
+        <div class="tab-content active" id="tab-case">
+            <div class="stats">
+                <div class="stat"><div class="stat-value" id="total-opens">0</div><div class="stat-label">Открытий</div></div>
+                <div class="stat"><div class="stat-value" id="pity-count">0</div><div class="stat-label">До гаранта</div></div>
+                <div class="stat"><div class="stat-value" id="best-rarity">-</div><div class="stat-label">Лучший дроп</div></div>
+            </div>
+            <div class="case-section">
+                <button class="case-btn" id="caseButton" onclick="openCase()">🎁</button>
+                <p class="case-label">Нажми, чтобы открыть Кейс Кринжа</p>
+            </div>
+            <div class="result-area" id="resultArea"><p style="color:#888;">Жми на кейс, Сигма</p></div>
         </div>
 
-        <div class="result-area" id="resultArea">
-            <p style="color:#888;">Жми на кейс, Сигма</p>
+        <!-- Вкладка инвентаря -->
+        <div class="tab-content" id="tab-inventory">
+            <h3 style="text-align:center;color:#00ffff;margin-bottom:15px;">📦 Твой инвентарь</h3>
+            <div class="inventory-grid" id="inventoryGrid"></div>
         </div>
 
-        <div class="inventory-section" id="inventorySection">
-            <!-- Заполнится через JS -->
+        <!-- Вкладка обмена -->
+        <div class="tab-content" id="tab-trade">
+            <h3 style="text-align:center;color:#00ffff;margin-bottom:15px;">🔄 Обмен с игроками</h3>
+            
+            <div class="trade-form">
+                <h4 style="margin-bottom:10px;">📤 Предложить обмен</h4>
+                <input type="text" id="trade-tg-id" placeholder="Telegram ID игрока (цифры)">
+                <input type="text" id="trade-my-item" placeholder="ID предмета (например: skibidi)">
+                <input type="text" id="trade-their-item" placeholder="Что хочешь взамен (ID предмета)">
+                <button onclick="sendTrade()">🚀 Отправить предложение</button>
+            </div>
+
+            <div class="pending-trades" id="pendingTrades">
+                <h4 style="margin-bottom:10px;">⏳ Ожидают ответа</h4>
+                <p style="color:#888;" id="no-trades">Нет активных трейдов</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // ========== КОНФИГУРАЦИЯ SUPABASE ==========
+        // ЗАМЕНИ ЭТИ СТРОКИ НА СВОИ ДАННЫЕ ИЗ SUPABASE!
+        const SUPABASE_URL = 'https://ТВОЙ-ПРОЕКТ.supabase.co';
+        const SUPABASE_KEY = 'ТВОЙ-ANON-КЛЮЧ';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ========== TELEGRAM ==========
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
-        const playerName = tg.initDataUnsafe?.user?.username || 
-                          tg.initDataUnsafe?.user?.first_name || 
-                          'Анонимный Сигма';
-        document.getElementById('username').innerText = '⚡ ' + playerName;
+        const tgId = tg.initDataUnsafe?.user?.id || 12345;
+        const playerName = tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || 'Анонимный Сигма';
+        document.getElementById('username').innerText = '⚡ ' + playerName + ' (ID: ' + tgId + ')';
 
-        // ========== ДАННЫЕ ИГРЫ ==========
+        // ========== ДАННЫЕ ПРЕДМЕТОВ ==========
         const items = [
             { id: 'skibidi', name: 'Скибиди Туалет', rarity: 'chrome', emoji: '🚽', chance: 60, color: '#888' },
             { id: 'sigma', name: 'Сигма-бой', rarity: 'chrome', emoji: '🗿', chance: 60, color: '#888' },
@@ -314,156 +141,247 @@
             { id: 'shaman', name: 'Зумер-Шаман', rarity: 'mythic', emoji: '👽', chance: 0.1, color: '#ff0000' }
         ];
 
-        // Загружаем сохранения из localStorage
-        let gameData = JSON.parse(localStorage.getItem('brainrot_data')) || {
-            totalOpens: 0,
-            pityCounter: 0,
-            bestRarity: 'none',
-            inventory: {}
-        };
+        let gameData = { totalOpens: 0, pityCounter: 0, bestRarity: 'none', inventory: [] };
 
-        // ========== ФУНКЦИИ ==========
+        // ========== ЗАГРУЗКА ДАННЫХ ИГРОКА ИЗ SUPABASE ==========
+        async function loadPlayer() {
+            // Ищем игрока
+            let { data: player } = await supabase
+                .from('players')
+                .select('*')
+                .eq('tg_id', tgId)
+                .single();
+
+            // Если нет - создаём
+            if (!player) {
+                await supabase.from('players').insert({ tg_id: tgId, username: playerName });
+                player = { total_opens: 0, pity_counter: 0, best_rarity: 'none' };
+            }
+
+            gameData.totalOpens = player.total_opens;
+            gameData.pityCounter = player.pity_counter;
+            gameData.bestRarity = player.best_rarity;
+
+            // Загружаем инвентарь
+            let { data: inv } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('player_tg_id', tgId);
+            
+            gameData.inventory = inv || [];
+
+            updateStats();
+            renderInventory();
+            loadPendingTrades();
+        }
+
+        // ========== СОХРАНЕНИЕ ИГРОКА ==========
+        async function savePlayer() {
+            await supabase
+                .from('players')
+                .upsert({
+                    tg_id: tgId,
+                    username: playerName,
+                    total_opens: gameData.totalOpens,
+                    pity_counter: gameData.pityCounter,
+                    best_rarity: gameData.bestRarity
+                });
+        }
+
+        // ========== ОТКРЫТИЕ КЕЙСА ==========
         function getRandomItem() {
             const roll = Math.random() * 100;
             let cumulative = 0;
-
-            // Проверка гаранта
             if (gameData.pityCounter >= 10) {
-                // Гарант: Rare или выше
-                const rarePlus = items.filter(i => 
-                    ['rare', 'epic', 'legendary', 'mythic'].includes(i.rarity)
-                );
+                const rarePlus = items.filter(i => ['rare', 'epic', 'legendary', 'mythic'].includes(i.rarity));
                 return rarePlus[Math.floor(Math.random() * rarePlus.length)];
             }
-
             for (const item of items) {
                 cumulative += item.chance;
                 if (roll <= cumulative) return item;
             }
-            return items[0]; // fallback
+            return items[0];
         }
 
-        function updatePity(rarity) {
-            if (['epic', 'legendary', 'mythic'].includes(rarity)) {
-                gameData.pityCounter = 0; // Сброс
-            } else if (rarity === 'rare') {
-                gameData.pityCounter = 0; // Тоже сброс на Rare
+        async function openCase() {
+            const item = getRandomItem();
+            gameData.totalOpens++;
+            
+            if (['epic', 'legendary', 'mythic', 'rare'].includes(item.rarity)) {
+                gameData.pityCounter = 0;
             } else {
                 gameData.pityCounter++;
             }
-        }
 
-        function addToInventory(item) {
-            if (!gameData.inventory[item.id]) {
-                gameData.inventory[item.id] = {
-                    ...item,
-                    count: 0
-                };
-            }
-            gameData.inventory[item.id].count++;
-        }
-
-        function saveGame() {
-            localStorage.setItem('brainrot_data', JSON.stringify(gameData));
-        }
-
-        function updateStats() {
-            document.getElementById('total-opens').innerText = gameData.totalOpens;
-            document.getElementById('pity-count').innerText = 10 - gameData.pityCounter;
-            
-            const bestMap = {
-                'none': '-',
-                'chrome': '🚽',
-                'common': '💚',
-                'rare': '💙',
-                'epic': '💜',
-                'legendary': '🧡',
-                'mythic': '❤️'
-            };
-            document.getElementById('best-rarity').innerText = bestMap[gameData.bestRarity];
-        }
-
-        function renderInventory() {
-            const section = document.getElementById('inventorySection');
-            const items = Object.values(gameData.inventory);
-            
-            if (items.length === 0) {
-                section.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">Инвентарь пуст. Открой кейс!</p>';
-                return;
-            }
-
-            let html = '<div class="inventory-title">📦 Инвентарь</div><div class="inventory-grid">';
-            
-            items.forEach(item => {
-                html += `
-                    <div class="inv-item rarity-${item.rarity}">
-                        <div class="inv-emoji">${item.emoji}</div>
-                        <div>${item.name}</div>
-                        <div class="inv-count">x${item.count}</div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            section.innerHTML = html;
-        }
-
-        function openCase() {
-            const item = getRandomItem();
-            
-            // Обновляем данные
-            gameData.totalOpens++;
-            updatePity(item.rarity);
-            addToInventory(item);
-
-            // Обновляем лучшую редкость
             const rarityRank = ['chrome', 'common', 'rare', 'epic', 'legendary', 'mythic'];
-            const currentRank = rarityRank.indexOf(item.rarity);
-            const bestRank = rarityRank.indexOf(gameData.bestRarity);
-            if (currentRank > bestRank) {
+            if (rarityRank.indexOf(item.rarity) > rarityRank.indexOf(gameData.bestRarity)) {
                 gameData.bestRarity = item.rarity;
             }
 
-            saveGame();
+            // Сохраняем игрока
+            await savePlayer();
 
-            // Эффект тряски
+            // Добавляем предмет в инвентарь
+            let { data: existing } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('player_tg_id', tgId)
+                .eq('item_id', item.id)
+                .single();
+
+            if (existing) {
+                await supabase
+                    .from('inventory')
+                    .update({ count: existing.count + 1 })
+                    .eq('id', existing.id);
+            } else {
+                await supabase
+                    .from('inventory')
+                    .insert({
+                        player_tg_id: tgId,
+                        item_id: item.id,
+                        item_name: item.name,
+                        rarity: item.rarity,
+                        emoji: item.emoji,
+                        count: 1
+                    });
+            }
+
+            // Перезагружаем инвентарь
+            let { data: inv } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('player_tg_id', tgId);
+            gameData.inventory = inv || [];
+
+            // Анимация
             document.querySelector('.container').classList.add('shake');
-            setTimeout(() => {
-                document.querySelector('.container').classList.remove('shake');
-            }, 600);
+            setTimeout(() => document.querySelector('.container').classList.remove('shake'), 600);
 
-            // Показываем результат
-            const resultArea = document.getElementById('resultArea');
-            resultArea.innerHTML = `
+            document.getElementById('resultArea').innerHTML = `
                 <div class="result-item">
                     <span class="result-emoji">${item.emoji}</span>
-                    <div class="result-rarity" style="color:${item.color}">
-                        ${item.rarity.toUpperCase()}
-                    </div>
+                    <div class="result-rarity" style="color:${item.color}">${item.rarity.toUpperCase()}</div>
                     <div style="font-size:20px;">${item.name}</div>
-                </div>
-            `;
+                </div>`;
 
-            // Дополнительный эффект для высоких редкостей
             if (['legendary', 'mythic'].includes(item.rarity)) {
                 document.body.style.background = item.rarity === 'mythic' ? '#1a0000' : '#1a0f00';
-                setTimeout(() => {
-                    document.body.style.background = '#0a0a0a';
-                }, 1000);
+                setTimeout(() => document.body.style.background = '#0a0a0a', 1000);
             }
 
             updateStats();
             renderInventory();
         }
 
-        // ========== ЗАПУСК ==========
-        updateStats();
-        renderInventory();
+        // ========== ОТПРАВКА ТРЕЙДА ==========
+        async function sendTrade() {
+            const toTgId = parseInt(document.getElementById('trade-tg-id').value);
+            const myItem = document.getElementById('trade-my-item').value;
+            const theirItem = document.getElementById('trade-their-item').value;
 
-        // Авто-сохранение при выходе из приложения
-        tg.onEvent('viewportChanged', () => {
-            if (!tg.isExpanded) saveGame();
-        });
-    </script>
-</body>
-</html>
+            if (!toTgId || !myItem || !theirItem) {
+                alert('Заполни все поля!');
+                return;
+            }
+
+            const { error } = await supabase
+                .from('trades')
+                .insert({
+                    from_tg_id: tgId,
+                    to_tg_id: toTgId,
+                    from_item_id: myItem,
+                    to_item_id: theirItem,
+                    status: 'pending'
+                });
+
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                alert('Предложение отправлено! Игрок увидит его в своём разделе обмена.');
+                document.getElementById('trade-tg-id').value = '';
+                document.getElementById('trade-my-item').value = '';
+                document.getElementById('trade-their-item').value = '';
+            }
+        }
+
+        // ========== ЗАГРУЗКА ВХОДЯЩИХ ТРЕЙДОВ ==========
+        async function loadPendingTrades() {
+            let { data: trades } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('to_tg_id', tgId)
+                .eq('status', 'pending');
+
+            const container = document.getElementById('pendingTrades');
+            
+            if (!trades || trades.length === 0) {
+                document.getElementById('no-trades').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('no-trades').style.display = 'none';
+            
+            let html = '<h4 style="margin-bottom:10px;">⏳ Входящие предложения</h4>';
+            trades.forEach(trade => {
+                html += `
+                    <div class="trade-card">
+                        <p>🎁 Игрок ${trade.from_tg_id} предлагает:</p>
+                        <p>📤 Отдаёт: <b>${trade.from_item_id}</b></p>
+                        <p>📥 Хочет: <b>${trade.to_item_id}</b></p>
+                        <button onclick="acceptTrade(${trade.id})">✅ Принять</button>
+                        <button class="reject-btn" onclick="rejectTrade(${trade.id})">❌ Отклонить</button>
+                    </div>`;
+            });
+            
+            // Убираем старый заголовок если он уже есть
+            const existingTitle = container.querySelector('h4');
+            if (!existingTitle) {
+                container.innerHTML = html;
+            } else {
+                // Оставляем только новые карточки
+                const cards = container.querySelectorAll('.trade-card');
+                cards.forEach(c => c.remove());
+                container.innerHTML += html;
+            }
+        }
+
+        // ========== ПРИНЯТИЕ ТРЕЙДА ==========
+        async function acceptTrade(tradeId) {
+            // Получаем данные трейда
+            const { data: trade } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('id', tradeId)
+                .single();
+
+            if (!trade) return;
+
+            // Меняем предметы местами (очень упрощённо)
+            // В реальной версии здесь нужно больше проверок
+            
+            await supabase
+                .from('trades')
+                .update({ status: 'accepted' })
+                .eq('id', tradeId);
+
+            alert('Обмен совершён! (В тестовой версии предметы пока не переносятся автоматически)');
+            loadPendingTrades();
+            renderInventory();
+        }
+
+        async function rejectTrade(tradeId) {
+            await supabase
+                .from('trades')
+                .update({ status: 'rejected' })
+                .eq('id', tradeId);
+            
+            loadPendingTrades();
+        }
+
+        // ========== ОТОБРАЖЕНИЕ ==========
+        function updateStats() {
+            document.getElementById('total-opens').innerText = gameData.totalOpens;
+            document.getElementById('pity-count').innerText = 10 - gameData.pityCounter;
+            const bestMap = { 'none': '-', 'chrome': '🚽', 'common': '💚', 'rare': '💙', 'epic': '💜', 'legendary': '🧡', 'mythic': '❤️' };
+            document.getElementById('best-rarity').innerText = bestMap[gameData.be
