@@ -8,72 +8,145 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0a0a;color:#fff;font-family:Arial,sans-serif;min-height:100vh;text-align:center;padding:15px}
-        h1{background:linear-gradient(45deg,#ff00ff,#00ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:22px;margin:10px 0}
-        .tabs{display:flex;gap:8px;justify-content:center;margin:15px 0;flex-wrap:wrap}
-        .tab-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:12px 18px;border-radius:10px;cursor:pointer;font-size:15px}
-        .tab-btn.active{background:#ff00ff;border-color:#ff00ff}
+        body{background:#0a0a0a;color:#fff;font-family:'Courier New',monospace;min-height:100vh;text-align:center;padding:15px;overflow-x:hidden}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:999;animation:scan 0.1s infinite}
+        @keyframes scan{0%{transform:translateY(0)}100%{transform:translateY(4px)}}
+        .container{position:relative;z-index:1;max-width:400px;margin:0 auto}
+        h1{background:linear-gradient(45deg,#ff00ff,#00ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:24px;margin:10px 0;animation:glitch 2s infinite}
+        @keyframes glitch{0%,100%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(2px,-2px)}60%{transform:translate(-1px,-1px)}80%{transform:translate(1px,1px)}}
+        .tabs{display:flex;gap:6px;justify-content:center;margin:15px 0;flex-wrap:wrap}
+        .tab-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:12px;font-family:monospace;transition:all 0.3s}
+        .tab-btn.active{background:#ff00ff;border-color:#ff00ff;box-shadow:0 0 15px rgba(255,0,255,0.5);transform:scale(1.05)}
         .tab-content{display:none}
-        .tab-content.active{display:block}
-        .stats{display:flex;justify-content:space-around;background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0}
-        .stat-val{font-size:22px;font-weight:bold;color:#ff00ff}
-        .stat-lbl{font-size:11px;color:#888}
-        .case-btn{width:140px;height:140px;border-radius:50%;border:3px solid #ff00ff;background:radial-gradient(circle,#2a2a2a,#0a0a0a);color:#fff;font-size:60px;cursor:pointer;box-shadow:0 0 30px rgba(255,0,255,0.4);margin:20px auto;display:block;animation:pulse 2s infinite}
-        @keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(255,0,255,0.4)}50%{box-shadow:0 0 60px rgba(255,0,255,0.7)}}
-        .result{min-height:80px;padding:15px;background:rgba(0,0,0,0.3);border-radius:15px;margin:10px 0}
-        .result-emoji{font-size:60px}
-        .result-rarity{font-size:20px;font-weight:bold;text-transform:uppercase}
+        .tab-content.active{display:block;animation:fadeIn 0.3s}
+        @keyframes fadeIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+        .stats{display:flex;justify-content:space-around;background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0;border:1px solid rgba(255,255,255,0.1);flex-wrap:wrap;gap:10px}
+        .stat-val{font-size:20px;font-weight:bold;color:#ff00ff;text-shadow:0 0 10px rgba(255,0,255,0.5)}
+        .stat-lbl{font-size:9px;color:#888;margin-top:3px}
+        .case-btn{width:150px;height:150px;border-radius:50%;border:4px solid #ff00ff;background:radial-gradient(circle,#1a1a1a,#0a0a0a);color:#fff;font-size:65px;cursor:pointer;box-shadow:0 0 30px rgba(255,0,255,0.3),0 0 60px rgba(255,0,255,0.1);margin:20px auto;display:block;animation:pulse 2s infinite;transition:all 0.3s}
+        @keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(255,0,255,0.3),0 0 60px rgba(255,0,255,0.1)}50%{box-shadow:0 0 50px rgba(255,0,255,0.6),0 0 90px rgba(255,0,255,0.3)}}
+        .case-btn:active{transform:scale(0.85);box-shadow:0 0 80px rgba(255,0,255,0.8)}
+        .case-btn.disabled,.btn:disabled{pointer-events:none;opacity:0.5;animation:none}
+        .result{min-height:100px;padding:20px;background:rgba(0,0,0,0.3);border-radius:15px;margin:10px 0;border:1px solid rgba(255,255,255,0.05);position:relative;overflow:hidden}
+        .result-emoji{font-size:70px;display:block;animation:dropIn 0.5s ease-out}
+        .result-rarity{font-size:22px;font-weight:bold;text-transform:uppercase;letter-spacing:3px;margin:10px 0}
+        @keyframes dropIn{0%{transform:translateY(-60px) scale(0);opacity:0}70%{transform:translateY(10px) scale(1.1)}100%{transform:translateY(0) scale(1);opacity:1}}
+        @keyframes epicDrop{0%{transform:scale(0) rotate(180deg);opacity:0}50%{transform:scale(1.3) rotate(-10deg);opacity:1}70%{transform:scale(0.9) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+        @keyframes legendaryDrop{0%{transform:scale(0);opacity:0}30%{transform:scale(1.5);opacity:1;filter:brightness(2)}60%{transform:scale(0.8);filter:brightness(1)}80%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+        @keyframes mythicDrop{0%{transform:scale(0) rotate(360deg);opacity:0;filter:hue-rotate(0deg)}50%{transform:scale(2) rotate(-20deg);opacity:1;filter:hue-rotate(180deg) brightness(3)}100%{transform:scale(1) rotate(0);opacity:1;filter:hue-rotate(360deg)}}
+        .shake{animation:shake 0.6s ease-in-out}
+        @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-15px,5px)}20%{transform:translate(15px,-5px)}30%{transform:translate(-10px,10px)}40%{transform:translate(10px,-10px)}50%{transform:translate(-5px,5px)}60%{transform:translate(5px,-5px)}70%{transform:translate(-8px,8px)}80%{transform:translate(8px,-8px)}90%{transform:translate(-3px,3px)}}
+        .flash-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000;opacity:0;transition:opacity 0.1s}
         .inv-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-        .inv-item{background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;width:80px;border:1px solid #444;font-size:11px}
-        .inv-emoji{font-size:30px}
-        .trade-box{background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0}
-        .trade-box input{width:100%;padding:12px;margin:5px 0;background:#111;border:1px solid #444;color:#fff;border-radius:10px;font-size:16px}
-        .btn{background:#ff00ff;color:#fff;border:none;padding:14px;border-radius:10px;font-size:16px;cursor:pointer;width:100%;margin-top:10px}
+        .inv-item{background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;width:78px;border:2px solid #333;font-size:10px;transition:all 0.3s;cursor:pointer;position:relative}
+        .inv-item:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(0,0,0,0.5)}
+        .inv-item.selected{border-color:#ff00ff!important;box-shadow:0 0 15px rgba(255,0,255,0.5);background:rgba(255,0,255,0.15)}
+        .inv-item.craft-selected{border-color:#ffaa00!important;box-shadow:0 0 15px rgba(255,170,0,0.6);background:rgba(255,170,0,0.2);animation:craftPulse 0.5s infinite}
+        @keyframes craftPulse{0%,100%{box-shadow:0 0 15px rgba(255,170,0,0.6)}50%{box-shadow:0 0 30px rgba(255,170,0,1)}}
+        .inv-emoji{font-size:28px}
+        .inv-count-badge{position:absolute;top:-5px;right:-5px;background:#ff00ff;color:#fff;border-radius:50%;width:20px;height:20px;font-size:10px;line-height:20px;text-align:center}
+        .history-box{background:rgba(255,255,255,0.03);border-radius:15px;padding:15px;margin:15px 0;border:1px solid rgba(255,255,255,0.08)}
+        .history-item{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px}
+        .history-emoji{font-size:25px}
+        .craft-box{background:rgba(255,170,0,0.05);border-radius:15px;padding:15px;margin:10px 0;border:2px solid rgba(255,170,0,0.3)}
+        .craft-box h3{color:#ffaa00;margin-bottom:10px}
+        .craft-slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:60px;margin:15px 0}
+        .craft-slot{width:60px;height:60px;border:2px dashed #444;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#444}
+        .craft-slot.filled{border-color:#ffaa00;background:rgba(255,170,0,0.1)}
+        .craft-info{color:#888;font-size:11px;margin:10px 0}
+        .craft-result{min-height:60px;padding:10px;margin:10px 0;border-radius:10px;background:rgba(0,0,0,0.3)}
+        .btn-craft{background:linear-gradient(45deg,#ffaa00,#ff6600);color:#000;border:none;padding:14px;border-radius:10px;font-size:16px;cursor:pointer;width:100%;margin-top:10px;font-family:monospace;font-weight:bold;transition:all 0.3s;box-shadow:0 0 15px rgba(255,170,0,0.3)}
+        .btn-craft:active{transform:scale(0.95);box-shadow:0 0 30px rgba(255,170,0,0.6)}
+        .btn-craft:disabled{background:#444;box-shadow:none;color:#888}
+        .trade-box{background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin:10px 0;border:1px solid rgba(255,255,255,0.1)}
+        .trade-box input{width:100%;padding:12px;margin:5px 0;background:#111;border:1px solid #444;color:#fff;border-radius:10px;font-size:16px;font-family:monospace}
+        .btn{background:linear-gradient(45deg,#ff00ff,#cc00cc);color:#fff;border:none;padding:14px;border-radius:10px;font-size:16px;cursor:pointer;width:100%;margin-top:10px;font-family:monospace;font-weight:bold;transition:all 0.3s;box-shadow:0 0 15px rgba(255,0,255,0.3)}
+        .btn:active{transform:scale(0.95);box-shadow:0 0 30px rgba(255,0,255,0.6)}
         .trade-card{background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin:8px 0;border:1px solid #444;font-size:13px;text-align:left}
-        .trade-card button{padding:8px 14px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin:3px;font-size:14px}
-        .accept-btn{background:#00ff88;color:#000}
-        .reject-btn{background:#ff4444;color:#fff}
+        .trade-card button{padding:8px 14px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin:3px;font-size:14px;font-family:monospace}
+        .accept-btn{background:#00ff88;color:#000;box-shadow:0 0 10px rgba(0,255,136,0.3)}
+        .reject-btn{background:#ff4444;color:#fff;box-shadow:0 0 10px rgba(255,68,68,0.3)}
+        .craft-chances{display:flex;justify-content:space-around;margin:10px 0;font-size:10px;color:#888}
+        .craft-chance{text-align:center}
+        .craft-chance span{display:block;font-size:14px;color:#ffaa00;font-weight:bold}
     </style>
 </head>
 <body>
-    <h1>🧠 Brainrot Collector</h1>
-    <p id="username" style="color:#888">Загрузка...</p>
-    <p style="color:#666;font-size:11px">TG ID: <span id="myId"></span></p>
+    <div class="flash-overlay" id="flashOverlay"></div>
+    <div class="container">
+        <h1>🧠 Brainrot Collector</h1>
+        <p id="username" style="color:#888;font-size:13px">Загрузка...</p>
+        <p style="color:#666;font-size:10px">TG ID: <span id="myId"></span></p>
 
-    <div class="tabs">
-        <button class="tab-btn active" id="tabBtn-case">🎁 Кейсы</button>
-        <button class="tab-btn" id="tabBtn-inv">📦 Инвентарь</button>
-        <button class="tab-btn" id="tabBtn-trade">🔄 Обмен</button>
-    </div>
-
-    <div class="tab-content active" id="tab-case">
-        <div class="stats">
-            <div><div class="stat-val" id="opens">0</div><div class="stat-lbl">Открытий</div></div>
-            <div><div class="stat-val" id="pity">10</div><div class="stat-lbl">До гаранта</div></div>
-            <div><div class="stat-val" id="best">-</div><div class="stat-lbl">Лучший</div></div>
+        <div class="tabs">
+            <button class="tab-btn active" id="tabBtn-case">🎁 Кейс</button>
+            <button class="tab-btn" id="tabBtn-inv">📦 Инв</button>
+            <button class="tab-btn" id="tabBtn-craft">🔨 Крафт</button>
+            <button class="tab-btn" id="tabBtn-history">📜 Ист</button>
+            <button class="tab-btn" id="tabBtn-trade">🔄 Обмен</button>
         </div>
-        <button class="case-btn" id="caseButton">🎁</button>
-        <p style="color:#888;font-size:13px">Жми на кейс!</p>
-        <div class="result" id="result">Тут появится дроп</div>
-    </div>
 
-    <div class="tab-content" id="tab-inv">
-        <h3 style="color:#00ffff;margin:10px 0">📦 Инвентарь</h3>
-        <div class="inv-grid" id="inventory"></div>
-    </div>
-
-    <div class="tab-content" id="tab-trade">
-        <h3 style="color:#00ffff;margin:10px 0">🔄 Обмен</h3>
-        <div class="trade-box">
-            <p style="text-align:left;color:#888;font-size:12px">📤 Предложить обмен:</p>
-            <input type="number" id="tradeTo" placeholder="Telegram ID игрока">
-            <input type="text" id="tradeMy" placeholder="Твой предмет (ID)">
-            <input type="text" id="tradeTheir" placeholder="Что хочешь взамен (ID)">
-            <button class="btn" id="sendTradeBtn">🚀 Отправить</button>
+        <div class="tab-content active" id="tab-case">
+            <div class="stats">
+                <div><div class="stat-val" id="opens">0</div><div class="stat-lbl">Открытий</div></div>
+                <div><div class="stat-val" id="pity">10</div><div class="stat-lbl">До гаранта</div></div>
+                <div><div class="stat-val" id="best">-</div><div class="stat-lbl">Лучший</div></div>
+                <div><div class="stat-val" id="totalItems">0</div><div class="stat-lbl">Предметов</div></div>
+            </div>
+            <button class="case-btn" id="caseButton">🎁</button>
+            <p style="color:#888;font-size:13px;margin-top:10px">Жми на кейс, Сигма!</p>
+            <div class="result" id="result">Тут появится твой дроп</div>
         </div>
-        <div id="tradesList">
-            <p style="color:#888;font-size:13px">⏳ Входящие:</p>
-            <p style="color:#666">Нет трейдов</p>
+
+        <div class="tab-content" id="tab-inv">
+            <h3 style="color:#00ffff;margin:10px 0">📦 Твой инвентарь</h3>
+            <p style="color:#888;font-size:11px">Нажми на предмет для крафта (вкладка 🔨)</p>
+            <div class="inv-grid" id="inventory"></div>
+        </div>
+
+        <div class="tab-content" id="tab-craft">
+            <h3 style="color:#ffaa00;margin:10px 0">🔨 Крафт Брейнротов</h3>
+            <p style="color:#888;font-size:11px">Выбери 10 одинаковых предметов и скрафти</p>
+            
+            <div class="craft-chances">
+                <div class="craft-chance"><span>5%</span>Мифик/Лега</div>
+                <div class="craft-chance"><span>20%</span>Эпик</div>
+                <div class="craft-chance"><span>30%</span>Редкое</div>
+                <div class="craft-chance"><span>45%</span>Обычное/Мусор</div>
+            </div>
+
+            <div class="craft-box">
+                <p style="color:#ffaa00;font-size:14px">Выбрано: <b id="craftCount">0</b>/10</p>
+                <p style="color:#888;font-size:11px" id="craftItemName">Предмет не выбран</p>
+                <div class="craft-slots" id="craftSlots"></div>
+                <button class="btn-craft" id="craftButton" disabled onclick="doCraft()">🔨 Скрафтить!</button>
+            </div>
+
+            <div class="craft-result" id="craftResult">
+                <p style="color:#666">Результат крафта появится здесь</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-history">
+            <h3 style="color:#00ffff;margin:10px 0">📜 Последние дропы</h3>
+            <div class="history-box" id="historyList">
+                <p style="color:#666">Пока пусто. Открой кейс!</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-trade">
+            <h3 style="color:#00ffff;margin:10px 0">🔄 Обмен</h3>
+            <div class="trade-box">
+                <p style="text-align:left;color:#888;font-size:12px">📤 Предложить обмен:</p>
+                <input type="number" id="tradeTo" placeholder="Telegram ID игрока">
+                <input type="text" id="tradeMy" placeholder="Твой предмет (ID)">
+                <input type="text" id="tradeTheir" placeholder="Что хочешь взамен (ID)">
+                <button class="btn" id="sendTradeBtn">🚀 Отправить</button>
+            </div>
+            <div id="tradesList">
+                <p style="color:#888;font-size:13px">⏳ Входящие:</p>
+                <p style="color:#666">Нет трейдов</p>
+            </div>
         </div>
     </div>
 
@@ -92,20 +165,33 @@
         document.getElementById('myId').innerText = tgId;
 
         var items = [
-            {id:'skibidi',name:'Скибиди Туалет',rarity:'chrome',emoji:'🚽',chance:60,color:'#888'},
-            {id:'gigachad',name:'Гигачад',rarity:'common',emoji:'💪',chance:25,color:'#0f0'},
-            {id:'mamkin',name:'Мамкин Найн',rarity:'rare',emoji:'⚔️',chance:10,color:'#08f'},
-            {id:'cybercat',name:'Кибер-Кот',rarity:'epic',emoji:'🐱',chance:3.9,color:'#a0f'},
-            {id:'altushka',name:'Альтушка',rarity:'legendary',emoji:'👩‍💻',chance:1,color:'#fa0'},
-            {id:'shaman',name:'Зумер-Шаман',rarity:'mythic',emoji:'👽',chance:0.1,color:'#f00'}
+            {id:'skibidi',name:'Скибиди Туалет',rarity:'chrome',emoji:'🚽',chance:20,color:'#888'},
+            {id:'sigma',name:'Сигма-бой',rarity:'chrome',emoji:'🗿',chance:20,color:'#888'},
+            {id:'rizz',name:'Ризз-фейс',rarity:'chrome',emoji:'😏',chance:20,color:'#888'},
+            {id:'gigachad',name:'Гигачад',rarity:'common',emoji:'💪',chance:8,color:'#00ff00'},
+            {id:'oguzok',name:'Огузок',rarity:'common',emoji:'🍑',chance:8,color:'#00ff00'},
+            {id:'bombastic',name:'Бомбастик Сайд Ай',rarity:'common',emoji:'👀',chance:9,color:'#00ff00'},
+            {id:'mamkin',name:'Мамкин Найн',rarity:'rare',emoji:'⚔️',chance:3,color:'#0088ff'},
+            {id:'quad',name:'Квадробикер',rarity:'rare',emoji:'🦘',chance:3,color:'#0088ff'},
+            {id:'za-warudo',name:'За Вардо',rarity:'rare',emoji:'⏱️',chance:4,color:'#0088ff'},
+            {id:'cybercat',name:'Кибер-Кот с АК-47',rarity:'epic',emoji:'🐱',chance:1.3,color:'#aa00ff'},
+            {id:'npc',name:'NPC-Стример',rarity:'epic',emoji:'🤖',chance:1.3,color:'#aa00ff'},
+            {id:'grimace',name:'Гримейс Шейк',rarity:'epic',emoji:'🥤',chance:1.3,color:'#aa00ff'},
+            {id:'minecraft',name:'Майнкрафт Ситуация',rarity:'legendary',emoji:'⛏️',chance:0.3,color:'#ffaa00'},
+            {id:'altushka',name:'Альтушка с Госуслуг',rarity:'legendary',emoji:'👩‍💻',chance:0.4,color:'#ffaa00'},
+            {id:'drip',name:'Дрип-Лорд',rarity:'legendary',emoji:'🥶',chance:0.3,color:'#ffaa00'},
+            {id:'shaman',name:'Зумер-Шаман',rarity:'mythic',emoji:'👽',chance:0.05,color:'#ff0000'},
+            {id:'hyperborea',name:'Гипербореец',rarity:'mythic',emoji:'❄️',chance:0.05,color:'#ff0000'}
         ];
 
-        var totalOpens = 0, pity = 0, bestRarity = 'none';
+        var totalOpens = 0, pity = 0, bestRarity = 'none', dropHistory = [];
+        var craftSelected = null, craftItem = null;
 
-        // ВЕШАЕМ ОБРАБОТЧИКИ
         document.getElementById('caseButton').addEventListener('click', openCase);
         document.getElementById('tabBtn-case').addEventListener('click', function(){ switchTab('case'); });
         document.getElementById('tabBtn-inv').addEventListener('click', function(){ switchTab('inv'); });
+        document.getElementById('tabBtn-craft').addEventListener('click', function(){ switchTab('craft'); });
+        document.getElementById('tabBtn-history').addEventListener('click', function(){ switchTab('history'); });
         document.getElementById('tabBtn-trade').addEventListener('click', function(){ switchTab('trade'); });
         document.getElementById('sendTradeBtn').addEventListener('click', sendTrade);
 
@@ -138,6 +224,9 @@
         }
 
         function openCase() {
+            var btn = document.getElementById('caseButton');
+            btn.classList.add('disabled');
+            
             var item;
             if (pity >= 10) {
                 var rp = items.filter(function(i) { return ['rare','epic','legendary','mythic'].indexOf(i.rarity) >= 0; });
@@ -158,14 +247,50 @@
 
             supabase.from('players').upsert({ tg_id: tgId, username: playerName, total_opens: totalOpens, pity_counter: pity, best_rarity: bestRarity }).then(function() {});
             supabase.from('inventory').select('*').eq('player_tg_id', tgId).eq('item_id', item.id).single().then(function(res) {
-                if (res.data) {
-                    supabase.from('inventory').update({ count: res.data.count + 1 }).eq('id', res.data.id).then(function() {});
-                } else {
-                    supabase.from('inventory').insert({ player_tg_id: tgId, item_id: item.id, item_name: item.name, rarity: item.rarity, emoji: item.emoji, count: 1 }).then(function() {});
-                }
+                if (res.data) supabase.from('inventory').update({ count: res.data.count + 1 }).eq('id', res.data.id).then(function() {});
+                else supabase.from('inventory').insert({ player_tg_id: tgId, item_id: item.id, item_name: item.name, rarity: item.rarity, emoji: item.emoji, count: 1 }).then(function() {});
             });
 
-            document.getElementById('result').innerHTML = '<span class="result-emoji">' + item.emoji + '</span><br><span class="result-rarity" style="color:' + item.color + '">' + item.rarity + '</span><br>' + item.name;
+            dropHistory.unshift({ emoji: item.emoji, name: item.name, rarity: item.rarity, color: item.color, time: new Date().toLocaleTimeString() });
+            if (dropHistory.length > 20) dropHistory.pop();
+            localStorage.setItem('brainrot_history', JSON.stringify(dropHistory));
+
+            document.querySelector('.container').classList.add('shake');
+            setTimeout(function(){ document.querySelector('.container').classList.remove('shake'); }, 600);
+
+            var isRare = ['rare','epic','legendary','mythic'].indexOf(item.rarity) >= 0;
+            var delay = isRare ? 800 : 100;
+
+            if (isRare) {
+                document.getElementById('result').innerHTML = '<div style="font-size:40px;animation:pulse 0.3s infinite">💫</div><p style="color:#ff00ff">Чувствую что-то мощное...</p>';
+                var overlay = document.getElementById('flashOverlay');
+                overlay.style.background = item.rarity === 'mythic' ? 'rgba(255,0,0,0.8)' : item.rarity === 'legendary' ? 'rgba(255,170,0,0.8)' : item.rarity === 'epic' ? 'rgba(170,0,255,0.8)' : 'rgba(0,136,255,0.6)';
+                overlay.style.opacity = '1';
+                setTimeout(function(){ overlay.style.opacity = '0'; }, 300);
+            }
+
+            setTimeout(function() {
+                var animClass = 'dropIn';
+                if (item.rarity === 'epic') animClass = 'epicDrop';
+                if (item.rarity === 'legendary') animClass = 'legendaryDrop';
+                if (item.rarity === 'mythic') animClass = 'mythicDrop';
+
+                document.getElementById('result').innerHTML = '<span class="result-emoji" style="animation:' + animClass + ' 0.8s ease-out">' + item.emoji + '</span><div class="result-rarity" style="color:' + item.color + ';animation:' + animClass + ' 0.8s ease-out">' + item.rarity.toUpperCase() + '</div><div style="font-size:18px;margin-top:5px">' + item.name + '</div>';
+
+                if (item.rarity === 'legendary') {
+                    document.body.style.background = '#1a0f00';
+                    document.body.style.transition = 'background 1s';
+                    setTimeout(function(){ document.body.style.background = '#0a0a0a'; }, 1500);
+                }
+                if (item.rarity === 'mythic') {
+                    document.body.style.background = '#1a0000';
+                    document.body.style.transition = 'background 1s';
+                    setTimeout(function(){ document.body.style.background = '#0a0a0a'; }, 1500);
+                }
+
+                btn.classList.remove('disabled');
+            }, delay);
+
             updateUI();
             loadInv();
         }
@@ -174,26 +299,173 @@
             supabase.from('inventory').select('*').eq('player_tg_id', tgId).then(function(res) {
                 var inv = res.data;
                 var html = '';
-                if (!inv || inv.length === 0) html = '<p style="color:#888">Пусто. Открой кейс!</p>';
+                var count = 0;
+                if (!inv || inv.length === 0) html = '<p style="color:#888;padding:20px">Пусто. Открой кейс!</p>';
                 else {
                     inv.forEach(function(i) {
-                        var bc = i.rarity==='chrome'?'#888':i.rarity==='common'?'#0f0':i.rarity==='rare'?'#08f':i.rarity==='epic'?'#a0f':i.rarity==='legendary'?'#fa0':'#f00';
-                        html += '<div class="inv-item" style="border-color:' + bc + '"><div class="inv-emoji">' + i.emoji + '</div>' + i.item_name + '<br><small>x' + i.count + '</small><br><small style="color:#666">ID:' + i.item_id + '</small></div>';
+                        count += i.count;
+                        var bc = i.rarity==='chrome'?'#888':i.rarity==='common'?'#00ff00':i.rarity==='rare'?'#0088ff':i.rarity==='epic'?'#aa00ff':i.rarity==='legendary'?'#ffaa00':'#ff0000';
+                        var selectedClass = (craftSelected === i.item_id) ? ' selected' : '';
+                        html += '<div class="inv-item' + selectedClass + '" style="border-color:' + bc + '" onclick="selectForCraft(\'' + i.item_id + '\',\'' + i.item_name + '\',\'' + i.emoji + '\',' + i.count + ')" id="inv-' + i.item_id + '"><div class="inv-emoji">' + i.emoji + '</div>' + i.item_name + '<br><small style="color:#aaa">x' + i.count + '</small>' + (i.count >= 10 ? '<div class="inv-count-badge">10+</div>' : '') + '</div>';
                     });
                 }
                 document.getElementById('inventory').innerHTML = html;
+                document.getElementById('totalItems').innerText = count;
+                updateCraftUI();
             });
+        }
+
+        // === КРАФТ ===
+        function selectForCraft(itemId, itemName, emoji, count) {
+            if (count < 10) {
+                alert('Нужно минимум 10 одинаковых предметов для крафта! У тебя только ' + count + ' шт.');
+                return;
+            }
+            
+            // Снимаем выделение со всех
+            var allItems = document.querySelectorAll('.inv-item');
+            for (var i = 0; i < allItems.length; i++) allItems[i].classList.remove('selected');
+            
+            craftSelected = itemId;
+            craftItem = { id: itemId, name: itemName, emoji: emoji, count: count };
+            
+            // Выделяем выбранный
+            var el = document.getElementById('inv-' + itemId);
+            if (el) el.classList.add('selected');
+            
+            updateCraftUI();
+        }
+
+        function updateCraftUI() {
+            document.getElementById('craftCount').innerText = craftSelected ? '10' : '0';
+            document.getElementById('craftItemName').innerText = craftSelected ? craftItem.name + ' ' + craftItem.emoji : 'Предмет не выбран';
+            
+            var slotsHtml = '';
+            if (craftSelected) {
+                for (var i = 0; i < 10; i++) {
+                    slotsHtml += '<div class="craft-slot filled">' + craftItem.emoji + '</div>';
+                }
+            } else {
+                for (var j = 0; j < 10; j++) {
+                    slotsHtml += '<div class="craft-slot">?</div>';
+                }
+            }
+            document.getElementById('craftSlots').innerHTML = slotsHtml;
+            
+            var btn = document.getElementById('craftButton');
+            btn.disabled = !craftSelected;
+            if (!craftSelected) btn.innerText = '🔨 Выбери предмет'; 
+            else btn.innerText = '🔨 Скрафтить 10 ' + craftItem.name + '!';
+        }
+
+        function doCraft() {
+            if (!craftSelected) return;
+            
+            var btn = document.getElementById('craftButton');
+            btn.disabled = true;
+            btn.innerText = '⏳ Крафтим...';
+            
+            // Удаляем 10 предметов из инвентаря
+            supabase.from('inventory').select('*').eq('player_tg_id', tgId).eq('item_id', craftSelected).single().then(function(res) {
+                if (!res.data || res.data.count < 10) {
+                    alert('Недостаточно предметов!');
+                    btn.disabled = false;
+                    updateCraftUI();
+                    return;
+                }
+                
+                var newCount = res.data.count - 10;
+                if (newCount <= 0) {
+                    supabase.from('inventory').delete().eq('id', res.data.id).then(function() {});
+                } else {
+                    supabase.from('inventory').update({ count: newCount }).eq('id', res.data.id).then(function() {});
+                }
+                
+                // Определяем результат крафта
+                var craftRoll = Math.random() * 100;
+                var resultItem;
+                
+                if (craftRoll < 5) {
+                    // 5% - Мифик или Легендарка
+                    var topItems = items.filter(function(i) { return i.rarity === 'mythic' || i.rarity === 'legendary'; });
+                    resultItem = topItems[Math.floor(Math.random() * topItems.length)];
+                } else if (craftRoll < 25) {
+                    // 20% - Эпик
+                    var epicItems = items.filter(function(i) { return i.rarity === 'epic'; });
+                    resultItem = epicItems[Math.floor(Math.random() * epicItems.length)];
+                } else if (craftRoll < 55) {
+                    // 30% - Редкое
+                    var rareItems = items.filter(function(i) { return i.rarity === 'rare'; });
+                    resultItem = rareItems[Math.floor(Math.random() * rareItems.length)];
+                } else {
+                    // 45% - Обычное или Мусор
+                    var lowItems = items.filter(function(i) { return i.rarity === 'common' || i.rarity === 'chrome'; });
+                    resultItem = lowItems[Math.floor(Math.random() * lowItems.length)];
+                }
+                
+                // Добавляем результат в инвентарь
+                supabase.from('inventory').select('*').eq('player_tg_id', tgId).eq('item_id', resultItem.id).single().then(function(invRes) {
+                    if (invRes.data) {
+                        supabase.from('inventory').update({ count: invRes.data.count + 1 }).eq('id', invRes.data.id).then(function() {});
+                    } else {
+                        supabase.from('inventory').insert({ player_tg_id: tgId, item_id: resultItem.id, item_name: resultItem.name, rarity: resultItem.rarity, emoji: resultItem.emoji, count: 1 }).then(function() {});
+                    }
+                });
+                
+                // Эффекты
+                var isGood = ['rare','epic','legendary','mythic'].indexOf(resultItem.rarity) >= 0;
+                
+                if (isGood) {
+                    document.querySelector('.container').classList.add('shake');
+                    setTimeout(function(){ document.querySelector('.container').classList.remove('shake'); }, 600);
+                    
+                    var overlay = document.getElementById('flashOverlay');
+                    overlay.style.background = resultItem.rarity === 'mythic' ? 'rgba(255,0,0,0.8)' : 'rgba(255,170,0,0.8)';
+                    overlay.style.opacity = '1';
+                    setTimeout(function(){ overlay.style.opacity = '0'; }, 400);
+                }
+                
+                var animClass = resultItem.rarity === 'mythic' ? 'mythicDrop' : resultItem.rarity === 'legendary' ? 'legendaryDrop' : resultItem.rarity === 'epic' ? 'epicDrop' : 'dropIn';
+                
+                document.getElementById('craftResult').innerHTML = '<p style="color:#888;font-size:12px">Результат крафта:</p><span style="font-size:60px;display:block;animation:' + animClass + ' 0.8s ease-out">' + resultItem.emoji + '</span><div style="font-size:20px;color:' + resultItem.color + ';font-weight:bold;animation:' + animClass + ' 0.8s ease-out">' + resultItem.rarity.toUpperCase() + '</div><div style="font-size:16px">' + resultItem.name + '</div>';
+                
+                // Сброс выбора
+                craftSelected = null;
+                craftItem = null;
+                
+                btn.disabled = false;
+                updateCraftUI();
+                loadInv();
+                
+                // Сохраняем в историю
+                dropHistory.unshift({ emoji: resultItem.emoji, name: '[Крафт] ' + resultItem.name, rarity: resultItem.rarity, color: resultItem.color, time: new Date().toLocaleTimeString() });
+                if (dropHistory.length > 20) dropHistory.pop();
+                localStorage.setItem('brainrot_history', JSON.stringify(dropHistory));
+            });
+        }
+
+        function renderHistory() {
+            var saved = localStorage.getItem('brainrot_history');
+            if (saved) dropHistory = JSON.parse(saved);
+            var html = '';
+            if (dropHistory.length === 0) html = '<p style="color:#666;padding:10px">Пока пусто. Открой кейс!</p>';
+            else {
+                dropHistory.forEach(function(h) {
+                    html += '<div class="history-item"><span class="history-emoji">' + h.emoji + '</span><span style="color:' + h.color + ';flex:1;text-align:left">' + h.name + ' <small style="color:#888">(' + h.rarity + ')</small></span><small style="color:#666">' + h.time + '</small></div>';
+                });
+            }
+            document.getElementById('historyList').innerHTML = html;
         }
 
         function sendTrade() {
             var to = parseInt(document.getElementById('tradeTo').value);
             var my = document.getElementById('tradeMy').value.trim();
             var their = document.getElementById('tradeTheir').value.trim();
-            if (!to || !my || !their) { alert('Заполни все поля'); return; }
+            if (!to || !my || !their) { alert('Заполни все поля!'); return; }
             supabase.from('trades').insert({ from_tg_id: tgId, to_tg_id: to, from_item_id: my, to_item_id: their, status: 'pending' }).then(function(res) {
                 if (res.error) alert('Ошибка: ' + res.error.message);
                 else {
-                    alert('Предложение отправлено!');
+                    alert('✅ Предложение отправлено!');
                     document.getElementById('tradeTo').value = '';
                     document.getElementById('tradeMy').value = '';
                     document.getElementById('tradeTheir').value = '';
@@ -204,22 +476,21 @@
         function loadTrades() {
             supabase.from('trades').select('*').eq('to_tg_id', tgId).eq('status', 'pending').then(function(res) {
                 var trades = res.data;
-                var html = '<p style="color:#888;font-size:13px">⏳ Входящие:</p>';
-                if (!trades || trades.length === 0) html += '<p style="color:#666">Нет трейдов</p>';
+                var html = '<p style="color:#888;font-size:13px;margin-top:15px">⏳ Входящие предложения:</p>';
+                if (!trades || trades.length === 0) html += '<p style="color:#666;font-size:12px">Нет активных трейдов</p>';
                 else {
                     trades.forEach(function(t) {
-                        html += '<div class="trade-card">От <b>' + t.from_tg_id + '</b><br>📤 ' + t.from_item_id + '<br>📥 ' + t.to_item_id + '<br><button class="accept-btn" data-id="' + t.id + '">Принять</button><button class="reject-btn" data-id="' + t.id + '">Отклонить</button></div>';
+                        html += '<div class="trade-card">🎁 От игрока <b>' + t.from_tg_id + '</b><br>📤 Отдаёт: <b>' + t.from_item_id + '</b><br>📥 Хочет: <b>' + t.to_item_id + '</b><br><button class="accept-btn" data-id="' + t.id + '">✅ Принять</button><button class="reject-btn" data-id="' + t.id + '">❌ Отклонить</button></div>';
                     });
                 }
                 document.getElementById('tradesList').innerHTML = html;
                 
-                // Вешаем обработчики на кнопки
                 var acceptBtns = document.querySelectorAll('.accept-btn');
                 for (var i = 0; i < acceptBtns.length; i++) {
                     acceptBtns[i].addEventListener('click', function() {
                         var id = parseInt(this.getAttribute('data-id'));
                         supabase.from('trades').update({ status: 'accepted' }).eq('id', id).then(function() {
-                            alert('Обмен принят!');
+                            alert('🎉 Обмен принят!');
                             loadTrades();
                         });
                     });
@@ -244,8 +515,13 @@
             document.getElementById('tab-' + t).classList.add('active');
             document.getElementById('tabBtn-' + t).classList.add('active');
             if (t === 'inv') loadInv();
+            if (t === 'craft') { loadInv(); updateCraftUI(); }
+            if (t === 'history') renderHistory();
             if (t === 'trade') loadTrades();
         }
+
+        var savedHistory = localStorage.getItem('brainrot_history');
+        if (savedHistory) dropHistory = JSON.parse(savedHistory);
 
         init();
     </script>
