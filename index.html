@@ -31,17 +31,16 @@
         .shake{animation:shake 0.6s}
         @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-10px,4px)}40%{transform:translate(10px,-4px)}}
 
-        /* АНИМАЦИЯ РЕДКОГО ДРОПА НА ВЕСЬ ЭКРАН */
         .rare-drop-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3000;display:flex;align-items:center;justify-content:center;animation:rareDropIn 0.5s ease-out}
         @keyframes rareDropIn{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
-        .rare-drop-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,rgba(0,0,0,0.7),rgba(0,0,0,0.95))}
+        .rare-drop-bg{position:absolute;top:0;left:0;width:100%;height:100%}
         .rare-drop-content{position:relative;z-index:1;text-align:center;animation:rareDropFloat 1s infinite}
         @keyframes rareDropFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
         .rare-drop-emoji{font-size:120px;display:block;animation:rareDropSpin 1.5s infinite}
         @keyframes rareDropSpin{0%{transform:rotate(0) scale(1)}25%{transform:rotate(10deg) scale(1.2)}50%{transform:rotate(-10deg) scale(1)}75%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
         .rare-drop-rarity{font-size:28px;font-weight:bold;text-transform:uppercase;letter-spacing:4px;margin:10px 0}
         .rare-drop-name{font-size:20px;margin:5px 0}
-        .rare-drop-tap{color:#fff;font-size:14px;margin-top:20px;animation:pulse 1s infinite;background:rgba(255,255,255,0.2);padding:10px 20px;border-radius:20px;display:inline-block}
+        .rare-drop-tap{color:#fff;font-size:14px;margin-top:20px;animation:pulse 1s infinite;background:rgba(255,255,255,0.2);padding:10px 20px;border-radius:20px;display:inline-block;cursor:pointer}
 
         .inv-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         .inv-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:6px;width:72px;border:3px solid #888;font-size:7px;cursor:pointer;position:relative;transition:all 0.3s}
@@ -151,18 +150,16 @@
         var rarityOrder = {'mythic':0,'legendary':1,'epic':2,'rare':3,'common':4,'chrome':5};
 
         var itemLore = {
-            'skibidi':{5:'💡 Факт: Первый Скибиди был замечен в школьном чате. Автор не признался.',10:'📖 История: 100 Скибиди поют хором. Соседи вызвали полицию.',20:'🤫 СЕКРЕТ: Скибиди — портал в другое измерение. Но только по четвергам.'},
-            'gigachad':{5:'💡 Факт: Гигачад не проигрывает в "камень-ножницы". Он просто смотрит.',10:'📖 История: Заменил лампочку не вкручивая. Посмотрел на патрон.',20:'🤫 СЕКРЕТ: Под бородой — ещё один Гигачад. Бесконечно.'},
-            'altushka':{5:'💡 Факт: Альтушка — самозанятая. ИНН заканчивается на 666.',10:'📖 История: Подала на пособие. Одобрили 3 брейнкоина.',20:'🤫 СЕКРЕТ: Взламывает Пентагон править орфографию.'},
-            'shaman':{5:'💡 Факт: Шаман предсказывает дропы заклинанием "ну пожалуйста".',10:'📖 История: Вызвал духа прадеда. Прадед исчез.',20:'🤫 СЕКРЕТ: Знает дату твоей смерти. Менялась 3 раза.'}
+            'skibidi':{5:'💡 Факт: Первый Скибиди был замечен в школьном чате.',10:'📖 История: 100 Скибиди поют хором. Соседи вызвали полицию.',20:'🤫 СЕКРЕТ: Скибиди — портал в другое измерение.'},
+            'gigachad':{5:'💡 Факт: Гигачад не проигрывает в "камень-ножницы".',10:'📖 История: Заменил лампочку не вкручивая.',20:'🤫 СЕКРЕТ: Под бородой — ещё один Гигачад.'},
+            'altushka':{5:'💡 Факт: Альтушка — самозанятая. ИНН: 666.',10:'📖 История: Подала на пособие. Одобрили 3 брейнкоина.',20:'🤫 СЕКРЕТ: Взламывает Пентагон.'},
+            'shaman':{5:'💡 Факт: Шаман предсказывает дропы.',10:'📖 История: Вызвал духа прадеда.',20:'🤫 СЕКРЕТ: Знает дату твоей смерти.'}
         };
 
         function getLore(itemId, level) {
             var lore = itemLore[itemId];
             if (!lore) {
-                var s=['Украл чей-то ланч.','TikTok с 3 подписчиками. Все боты.','Если долго смотреть — начинает улыбаться.'];
-                var st=['Попал в рекомендации и пропал.','Устроился тестировщиком. Сломал всё. Повысили.'];
-                var f=['Боится щекотки. Но тела нет.','На 70% из мемов, на 30% из сожалений.'];
+                var s=['Украл чей-то ланч.','TikTok с 3 подписчиками.','Начинает улыбаться.'],st=['Попал в рекомендации.','Устроился тестировщиком.'],f=['Боится щекотки.','На 70% из мемов.'];
                 if(level>=20)return{text:s[Math.floor(Math.random()*s.length)],type:'lore-secret',title:'🤫 СЕКРЕТ'};
                 if(level>=10)return{text:st[Math.floor(Math.random()*st.length)],type:'lore-story',title:'📖 История'};
                 if(level>=5)return{text:f[Math.floor(Math.random()*f.length)],type:'lore-fact',title:'💡 Факт'};
@@ -207,7 +204,6 @@
         }
 
         function getItemIncome(item){return Math.floor((baseIncome[item.rarity]||1)*evoMultiplier[item.evolution||0]*(1+(item.upgrade_level||0)*0.5));}
-
         function updateUI(){
             document.getElementById('opens').innerText=totalOpens;document.getElementById('pity').innerText=Math.max(0,10-pity);
             var bm={'none':'-','chrome':'🚽','common':'💚','rare':'💙','epic':'💜','legendary':'🧡','mythic':'❤️'};document.getElementById('best').innerText=bm[bestRarity]||'-';
@@ -235,14 +231,7 @@
             overlay.querySelector('.modal-close').addEventListener('click',function(){overlay.remove()});
             overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove()});
             var upgBtn=overlay.querySelector('#modalUpgBtn');
-            if(upgBtn)upgBtn.addEventListener('click',function(e){e.stopPropagation();if(coins>=cost){coins-=cost;
-                // Прокачиваем ТУ ЖЕ карточку по ID
-                supabase.from('inventory').update({upgrade_level:lvl+1}).eq('id',invId).then(function(){
-                    supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
-                    // Обновляем allInv и перерисовываем модалку
-                    supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];renderInventory();overlay.remove();showModal(invId);});
-                });
-            }});
+            if(upgBtn)upgBtn.addEventListener('click',function(e){e.stopPropagation();if(coins>=cost){coins-=cost;supabase.from('inventory').update({upgrade_level:lvl+1}).eq('id',invId).then(function(){supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];renderInventory();overlay.remove();showModal(invId);});});}});
         }
 
         function quickEvo(itemId){
@@ -261,7 +250,6 @@
 
         function doEvo(itemId,targetEvo){var from=targetEvo-1;var same=allInv.filter(function(i){return i.item_id===itemId&&(i.evolution||0)===from&&!i.is_shiny});if(same.length<10)return;Promise.all(same.slice(0,10).map(function(i){return supabase.from('inventory').delete().eq('id',i.id)})).then(function(){supabase.from('inventory').insert({player_tg_id:tgId,item_id:itemId,item_name:same[0].item_name,rarity:same[0].rarity,emoji:same[0].emoji,evolution:targetEvo,upgrade_level:0,is_shiny:false}).then(function(){loadAllInv();renderInventory();loadEvoList();});});}
 
-        // КРАФТ
         function addToCraft(itemId){
             if(craftSlots.length>=10){alert('Максимум 10!');return;}
             var found=null;
@@ -320,22 +308,25 @@
             totalOpens++;pity=['epic','legendary','mythic','rare'].includes(item.rarity)?0:pity+1;
             var ranks=['chrome','common','rare','epic','legendary','mythic'];if(ranks.indexOf(item.rarity)>ranks.indexOf(bestRarity))bestRarity=item.rarity;
             var isShiny=Math.random()<0.02,isRare=['rare','epic','legendary','mythic'].includes(item.rarity);
+            document.getElementById('caseButton').classList.add('disabled');
             
-            // Сначала вставляем карту в базу
-            supabase.from('inventory').insert({player_tg_id:tgId,item_id:item.id,item_name:item.name+(isShiny?' ✨':''),rarity:item.rarity,emoji:item.emoji,evolution:0,upgrade_level:0,is_shiny:isShiny}).then(function(){
-                supabase.from('players').upsert({tg_id:tgId,total_opens:totalOpens,pity_counter:pity,best_rarity:bestRarity,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
-                supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];renderInventory();updateUI();});
-                
-                if(isRare){
-                    // Тряска и анимация на весь экран
-                    document.getElementById('mainContainer').classList.add('shake');
-                    setTimeout(function(){document.getElementById('mainContainer').classList.remove('shake')},600);
-                    document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;
-                    // Показываем НЕУБИРАЕМУЮ анимацию (только по нажатию)
-                    setTimeout(function(){showRareDropOverlay(item,isShiny);},300);
-                }else{
-                    document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;
-                }
+            if(isRare){
+                document.getElementById('result').innerHTML='<div style="font-size:35px">💫</div><p style="color:#ff00ff">Чувствую что-то мощное...</p>';
+                document.getElementById('mainContainer').classList.add('shake');
+                setTimeout(function(){document.getElementById('mainContainer').classList.remove('shake')},600);
+            }
+            
+            // ВАЖНО: сначала вставка в БД, потом загрузка инвентаря
+            supabase.from('inventory').insert({player_tg_id:tgId,item_id:item.id,item_name:item.name+(isShiny?' ✨':''),rarity:item.rarity,emoji:item.emoji,evolution:0,upgrade_level:0,is_shiny:isShiny}).then(function(insertRes){
+                if(insertRes.error){alert('Ошибка сохранения!');document.getElementById('caseButton').classList.remove('disabled');return;}
+                supabase.from('players').upsert({tg_id:tgId,total_opens:totalOpens,pity_counter:pity,best_rarity:bestRarity,coins:coins,last_seen:new Date().toISOString()}).then(function(){
+                    supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(invRes){
+                        allInv=invRes.data||[];renderInventory();updateUI();document.getElementById('caseButton').classList.remove('disabled');
+                        var resultHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;
+                        if(isRare){setTimeout(function(){document.getElementById('result').innerHTML=resultHTML;if(item.rarity==='legendary'||item.rarity==='mythic'){document.body.style.background=item.rarity==='mythic'?'#1a0000':'#1a0f00';setTimeout(function(){document.body.style.background='#0a0a0a'},1500);}showRareDropOverlay(item,isShiny);},800);}
+                        else{document.getElementById('result').innerHTML=resultHTML;}
+                    });
+                });
             });
         }
 
