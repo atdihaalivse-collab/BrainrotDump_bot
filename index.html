@@ -31,6 +31,18 @@
         .shake{animation:shake 0.6s}
         @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-10px,4px)}40%{transform:translate(10px,-4px)}}
 
+        /* АНИМАЦИЯ РЕДКОГО ДРОПА НА ВЕСЬ ЭКРАН */
+        .rare-drop-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3000;display:flex;align-items:center;justify-content:center;animation:rareDropIn 0.5s ease-out}
+        @keyframes rareDropIn{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+        .rare-drop-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,rgba(0,0,0,0.7),rgba(0,0,0,0.95))}
+        .rare-drop-content{position:relative;z-index:1;text-align:center;animation:rareDropFloat 1s infinite}
+        @keyframes rareDropFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+        .rare-drop-emoji{font-size:120px;display:block;animation:rareDropSpin 1.5s infinite}
+        @keyframes rareDropSpin{0%{transform:rotate(0) scale(1)}25%{transform:rotate(10deg) scale(1.2)}50%{transform:rotate(-10deg) scale(1)}75%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(0) scale(1)}}
+        .rare-drop-rarity{font-size:28px;font-weight:bold;text-transform:uppercase;letter-spacing:4px;margin:10px 0}
+        .rare-drop-name{font-size:20px;margin:5px 0}
+        .rare-drop-tap{color:#fff;font-size:14px;margin-top:20px;animation:pulse 1s infinite;background:rgba(255,255,255,0.2);padding:10px 20px;border-radius:20px;display:inline-block}
+
         .inv-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         .inv-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:6px;width:72px;border:3px solid #888;font-size:7px;cursor:pointer;position:relative;transition:all 0.3s}
         .inv-item:active{transform:scale(0.9)}
@@ -84,6 +96,11 @@
 
         .btn{background:linear-gradient(45deg,#ff00ff,#cc00cc);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;font-family:monospace;font-weight:bold;margin-top:4px}
         .btn:disabled{background:#444;color:#888}
+        .rating-table{width:100%;border-collapse:collapse;font-size:10px;margin:6px 0}
+        .rating-table th{background:rgba(255,100,150,0.2);padding:8px;color:#ff88aa}
+        .rating-table td{padding:6px;border-bottom:1px solid rgba(255,255,255,0.05)}
+        .top1{background:rgba(255,215,0,0.15);font-weight:bold}
+        .rating-me{background:rgba(255,0,255,0.15)!important;font-weight:bold}
     </style>
 </head>
 <body>
@@ -131,8 +148,8 @@
         var rarityColors = {'chrome':'#888','common':'#00ff00','rare':'#0088ff','epic':'#aa00ff','legendary':'#ffaa00','mythic':'#ff0000'};
         var evoStages = ['','Мега','Гига','Ультра','Бог'];
         var evoMultiplier = [1,1.5,2.5,5,10];
+        var rarityOrder = {'mythic':0,'legendary':1,'epic':2,'rare':3,'common':4,'chrome':5};
 
-        // МИНИ-ИСТОРИИ
         var itemLore = {
             'skibidi':{5:'💡 Факт: Первый Скибиди был замечен в школьном чате. Автор не признался.',10:'📖 История: 100 Скибиди поют хором. Соседи вызвали полицию.',20:'🤫 СЕКРЕТ: Скибиди — портал в другое измерение. Но только по четвергам.'},
             'gigachad':{5:'💡 Факт: Гигачад не проигрывает в "камень-ножницы". Он просто смотрит.',10:'📖 История: Заменил лампочку не вкручивая. Посмотрел на патрон.',20:'🤫 СЕКРЕТ: Под бородой — ещё один Гигачад. Бесконечно.'},
@@ -143,7 +160,9 @@
         function getLore(itemId, level) {
             var lore = itemLore[itemId];
             if (!lore) {
-                var s=['Украл чей-то ланч.','TikTok с 3 подписчиками.','Начинает улыбаться.'],st=['Попал в рекомендации.','Устроился тестировщиком.'],f=['Боится щекотки.','На 70% из мемов.'];
+                var s=['Украл чей-то ланч.','TikTok с 3 подписчиками. Все боты.','Если долго смотреть — начинает улыбаться.'];
+                var st=['Попал в рекомендации и пропал.','Устроился тестировщиком. Сломал всё. Повысили.'];
+                var f=['Боится щекотки. Но тела нет.','На 70% из мемов, на 30% из сожалений.'];
                 if(level>=20)return{text:s[Math.floor(Math.random()*s.length)],type:'lore-secret',title:'🤫 СЕКРЕТ'};
                 if(level>=10)return{text:st[Math.floor(Math.random()*st.length)],type:'lore-story',title:'📖 История'};
                 if(level>=5)return{text:f[Math.floor(Math.random()*f.length)],type:'lore-fact',title:'💡 Факт'};
@@ -197,9 +216,9 @@
         }
 
         function renderInventory(){
-            allInv.sort(function(a,b){var o={'mythic':0,'legendary':1,'epic':2,'rare':3,'common':4,'chrome':5};return(o[a.rarity]||99)-(o[b.rarity]||99)});
+            allInv.sort(function(a,b){return(rarityOrder[a.rarity]||99)-(rarityOrder[b.rarity]||99)});
             var html='',count=0,stacked={},unique=[];
-            for(var i=0;i<allInv.length;i++){var item=allInv[i];if((item.evolution||0)===0&&(item.upgrade_level||0)===0&&!item.is_shiny){if(!stacked[item.item_id])stacked[item.item_id]={count:0,emoji:item.emoji,name:item.item_name,rarity:item.rarity};stacked[item.item_id].count++;}else unique.push(item);}
+            for(var i=0;i<allInv.length;i++){var item=allInv[i];if((item.evolution||0)===0&&(item.upgrade_level||0)===0&&!item.is_shiny){var key=item.item_id;if(!stacked[key])stacked[key]={count:0,emoji:item.emoji,name:item.item_name,rarity:item.rarity};stacked[key].count++;}else unique.push(item);}
             var keys=Object.keys(stacked);for(var k=0;k<keys.length;k++){var s=stacked[keys[k]];count+=s.count;html+='<div class="inv-item rarity-'+s.rarity+'" onclick="addToCraft(\''+keys[k]+'\')"><span class="inv-emoji">'+s.emoji+'</span><span class="inv-name" style="color:'+(rarityColors[s.rarity]||'#fff')+'">'+s.name+'</span><div class="inv-count-badge">'+s.count+'</div>'+(s.count>=10?'<button class="inv-evo-btn" onclick="event.stopPropagation();quickEvo(\''+keys[k]+'\')">⭐</button>':'')+'</div>';}
             for(var u=0;u<unique.length;u++){var i=unique[u];count++;var evoName=(i.evolution||0)>0?evoStages[i.evolution]+' ':'';html+='<div class="inv-item rarity-'+i.rarity+' '+(i.is_shiny?'shiny':'')+' '+getEvoClass(i.evolution||0)+'" onclick="showModal('+i.id+')"><span class="inv-emoji">'+i.emoji+'</span><span class="inv-name" style="color:'+(rarityColors[i.rarity]||'#fff')+'">'+evoName+i.item_name+'</span><span style="font-size:7px;color:#ffd700">'+(i.is_shiny?'✨ ':'')+'Ур.'+(i.upgrade_level||0)+'</span></div>';}
             document.getElementById('inventory').innerHTML=html||'<p style="color:#888;padding:20px">Пусто</p>';document.getElementById('totalItems').innerText=count;updateUI();
@@ -216,7 +235,14 @@
             overlay.querySelector('.modal-close').addEventListener('click',function(){overlay.remove()});
             overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove()});
             var upgBtn=overlay.querySelector('#modalUpgBtn');
-            if(upgBtn)upgBtn.addEventListener('click',function(e){e.stopPropagation();if(coins>=cost){coins-=cost;supabase.from('inventory').update({upgrade_level:lvl+1}).eq('id',invId).then(function(){supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});loadAllInv();renderInventory();overlay.remove();showModal(invId);});}});
+            if(upgBtn)upgBtn.addEventListener('click',function(e){e.stopPropagation();if(coins>=cost){coins-=cost;
+                // Прокачиваем ТУ ЖЕ карточку по ID
+                supabase.from('inventory').update({upgrade_level:lvl+1}).eq('id',invId).then(function(){
+                    supabase.from('players').upsert({tg_id:tgId,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
+                    // Обновляем allInv и перерисовываем модалку
+                    supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];renderInventory();overlay.remove();showModal(invId);});
+                });
+            }});
         }
 
         function quickEvo(itemId){
@@ -235,54 +261,82 @@
 
         function doEvo(itemId,targetEvo){var from=targetEvo-1;var same=allInv.filter(function(i){return i.item_id===itemId&&(i.evolution||0)===from&&!i.is_shiny});if(same.length<10)return;Promise.all(same.slice(0,10).map(function(i){return supabase.from('inventory').delete().eq('id',i.id)})).then(function(){supabase.from('inventory').insert({player_tg_id:tgId,item_id:itemId,item_name:same[0].item_name,rarity:same[0].rarity,emoji:same[0].emoji,evolution:targetEvo,upgrade_level:0,is_shiny:false}).then(function(){loadAllInv();renderInventory();loadEvoList();});});}
 
+        // КРАФТ
         function addToCraft(itemId){
             if(craftSlots.length>=10){alert('Максимум 10!');return;}
-            var found=null;for(var i=0;i<allInv.length;i++){if(allInv[i].item_id===itemId&&(allInv[i].evolution||0)===0&&(allInv[i].upgrade_level||0)===0&&!allInv[i].is_shiny&&!craftSlots.find(function(x){return x.invId===allInv[i].id})){found=allInv[i];break;}}
-            if(!found){alert('Нет доступных!');return;}
+            var found=null;
+            for(var i=0;i<allInv.length;i++){if(allInv[i].item_id===itemId&&(allInv[i].evolution||0)===0&&(allInv[i].upgrade_level||0)===0&&!allInv[i].is_shiny){var already=false;for(var j=0;j<craftSlots.length;j++){if(craftSlots[j].invId===allInv[i].id){already=true;break;}}if(!already){found=allInv[i];break;}}}
+            if(!found){alert('Нет доступных карт!');return;}
             craftSlots.push({invId:found.id,item_id:found.item_id,emoji:found.emoji,name:found.item_name,rarity:found.rarity});
             renderCraftSlots();updateCraftPreview();renderInventory();
         }
         function renderCraftSlots(){
             var c=document.getElementById('craftSlotsContainer'),h='';
-            for(var i=0;i<craftSlots.length;i++)h+='<div style="width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,170,0,0.15);border:2px solid #ffaa00;position:relative"><span>'+craftSlots[i].emoji+'</span><div onclick="event.stopPropagation();removeFromCraft('+i+')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#f44;color:#fff;font-size:10px;line-height:18px;cursor:pointer">✕</div></div>';
+            for(var i=0;i<craftSlots.length;i++)h+='<div style="width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,170,0,0.15);border:2px solid #ffaa00;position:relative;cursor:pointer" onclick="removeFromCraft('+i+')"><span>'+craftSlots[i].emoji+'</span><div style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#f44;color:#fff;font-size:10px;line-height:18px;text-align:center">✕</div></div>';
             for(var j=craftSlots.length;j<10;j++)h+='<div style="width:42px;height:42px;border-radius:8px;border:2px dashed #555;display:flex;align-items:center;justify-content:center;font-size:18px;color:#555">?</div>';
-            c.innerHTML=h||'<p style="color:#555;font-size:10px">Нажимай на карты</p>';document.getElementById('craftCount').innerText=craftSlots.length;document.getElementById('craftButton').disabled=craftSlots.length<10;
+            c.innerHTML=h||'<p style="color:#555;font-size:10px">Нажимай на карты в инвентаре</p>';document.getElementById('craftCount').innerText=craftSlots.length;document.getElementById('craftButton').disabled=craftSlots.length<10;
         }
         function removeFromCraft(i){craftSlots.splice(i,1);renderCraftSlots();updateCraftPreview();renderInventory();}
         function updateCraftPreview(){
-            if(craftSlots.length===0){document.getElementById('craftPreview').innerHTML='<p style="color:#666">Добавь карты</p>';return;}
+            if(craftSlots.length===0){document.getElementById('craftPreview').innerHTML='<p style="color:#666;font-size:10px">Добавь карты</p>';return;}
             var rc={},ut=[];for(var i=0;i<craftSlots.length;i++){rc[craftSlots[i].rarity]=(rc[craftSlots[i].rarity]||0)+1;if(ut.indexOf(craftSlots[i].item_id)===-1)ut.push(craftSlots[i].item_id);}
             var b=ut.length*2+(rc.rare||0)*3+(rc.epic||0)*5+(rc.legendary||0)*8+(rc.mythic||0)*10;
-            var h='<b style="color:#ffaa00">Шансы:</b><br>';if(Math.min(10,0.5+b*0.3)>0.1)h+='🔴 Мифик: '+Math.min(10,0.5+b*0.3).toFixed(1)+'% ';if(Math.min(20,2+b*0.5)>0.1)h+='🟠 Лега: '+Math.min(20,2+b*0.5).toFixed(1)+'% ';if(Math.min(30,8+b*0.7)>0.1)h+='🟣 Эпик: '+Math.min(30,8+b*0.7).toFixed(1)+'% ';document.getElementById('craftPreview').innerHTML=h;
+            var mc=Math.min(10,0.5+b*0.3),lc=Math.min(20,2+b*0.5),ec=Math.min(30,8+b*0.7);
+            var h='<b style="color:#ffaa00;font-size:11px">Шансы редких+:</b><br>';
+            if(mc>0.5)h+='<span style="color:#f00;font-size:10px">🔴 Мифик: '+mc.toFixed(1)+'%</span> ';
+            if(lc>0.5)h+='<span style="color:#fa0;font-size:10px">🟠 Лега: '+lc.toFixed(1)+'%</span> ';
+            if(ec>0.5)h+='<span style="color:#a0f;font-size:10px">🟣 Эпик: '+ec.toFixed(1)+'%</span> ';
+            document.getElementById('craftPreview').innerHTML=h;
         }
         function doCraft(){
             if(craftSlots.length<10)return;var btn=document.getElementById('craftButton');btn.disabled=true;btn.innerText='⏳...';
             var rc={},ut=[];for(var i=0;i<craftSlots.length;i++){rc[craftSlots[i].rarity]=(rc[craftSlots[i].rarity]||0)+1;if(ut.indexOf(craftSlots[i].item_id)===-1)ut.push(craftSlots[i].item_id);}
             var b=ut.length*2+(rc.rare||0)*3+(rc.epic||0)*5+(rc.legendary||0)*8+(rc.mythic||0)*10,roll=Math.random()*100,ri;
-            if(roll<Math.min(10,0.5+b*0.3))ri=items.filter(function(i){return i.rarity==='mythic'});else if(roll<Math.min(10,0.5+b*0.3)+Math.min(20,2+b*0.5))ri=items.filter(function(i){return i.rarity==='legendary'});else if(roll<Math.min(10,0.5+b*0.3)+Math.min(20,2+b*0.5)+Math.min(30,8+b*0.7))ri=items.filter(function(i){return i.rarity==='epic'});else ri=items.filter(function(i){return i.rarity==='rare'||i.rarity==='common'||i.rarity==='chrome'});ri=ri[Math.floor(Math.random()*ri.length)];
-            Promise.all(craftSlots.map(function(x){return supabase.from('inventory').delete().eq('id',x.invId)})).then(function(){supabase.from('inventory').insert({player_tg_id:tgId,item_id:ri.id,item_name:ri.name,rarity:ri.rarity,emoji:ri.emoji,evolution:0,upgrade_level:0,is_shiny:false}).then(function(){craftSlots=[];renderCraftSlots();updateCraftPreview();loadAllInv();renderInventory();btn.disabled=true;btn.innerText='🔨 Скрафтить!';});});
+            var mc=Math.min(10,0.5+b*0.3),lc=Math.min(20,2+b*0.5),ec=Math.min(30,8+b*0.7);
+            if(roll<mc)ri=items.filter(function(i){return i.rarity==='mythic'});else if(roll<mc+lc)ri=items.filter(function(i){return i.rarity==='legendary'});else if(roll<mc+lc+ec)ri=items.filter(function(i){return i.rarity==='epic'});else ri=items.filter(function(i){return i.rarity==='rare'||i.rarity==='common'||i.rarity==='chrome'});ri=ri[Math.floor(Math.random()*ri.length)];
+            Promise.all(craftSlots.map(function(x){return supabase.from('inventory').delete().eq('id',x.invId)})).then(function(){
+                supabase.from('inventory').insert({player_tg_id:tgId,item_id:ri.id,item_name:ri.name,rarity:ri.rarity,emoji:ri.emoji,evolution:0,upgrade_level:0,is_shiny:false}).then(function(){
+                    supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];craftSlots=[];renderCraftSlots();updateCraftPreview();renderInventory();btn.disabled=true;btn.innerText='🔨 Скрафтить!';});
+                });
+            });
         }
 
         function loadAllInv(){supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];});}
-        function loadRating(){supabase.from('players').select('tg_id,username,coins').order('coins',{ascending:false}).limit(50).then(function(res){var p=res.data||[],h='<table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:rgba(255,100,150,0.2)"><th>#</th><th>Игрок</th><th>🧠</th></tr>';p.forEach(function(r,i){var c='';if(i===0)c='background:rgba(255,215,0,0.15);font-weight:bold';if(r.tg_id===tgId)c+='background:rgba(255,0,255,0.15)!important';h+='<tr style="'+c+'"><td>'+(i+1)+'</td><td>'+(r.username||'ID:'+r.tg_id)+'</td><td>'+r.coins+'</td></tr>';});document.getElementById('ratingList').innerHTML=h+'</table>';});}
-        
+        function loadRating(){supabase.from('players').select('tg_id,username,coins').order('coins',{ascending:false}).limit(50).then(function(res){var p=res.data||[],h='<table class="rating-table"><tr><th>#</th><th>Игрок</th><th>🧠</th></tr>';p.forEach(function(r,i){var c='';if(i===0)c='top1';if(r.tg_id===tgId)c+=' rating-me';h+='<tr class="'+c+'"><td>'+(i+1)+'</td><td>'+(r.username||'ID:'+r.tg_id)+'</td><td>'+r.coins+'</td></tr>';});document.getElementById('ratingList').innerHTML=h+'</table>';});}
+
+        function showRareDropOverlay(item,isShiny){
+            var overlay=document.createElement('div');overlay.className='rare-drop-overlay';
+            var rc=rarityColors[item.rarity]||'#fff';
+            var bgColor=item.rarity==='mythic'?'rgba(100,0,0,0.95)':item.rarity==='legendary'?'rgba(80,50,0,0.95)':item.rarity==='epic'?'rgba(50,0,80,0.95)':'rgba(0,30,60,0.95)';
+            overlay.innerHTML='<div class="rare-drop-bg" style="background:'+bgColor+'"></div><div class="rare-drop-content"><span class="rare-drop-emoji">'+item.emoji+(isShiny?'✨':'')+'</span><div class="rare-drop-rarity" style="color:'+rc+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</div><div class="rare-drop-name">'+item.name+'</div><div class="rare-drop-tap" onclick="this.parentElement.parentElement.remove()">👆 НАЖМИ ЧТОБЫ ПРОДОЛЖИТЬ</div></div>';
+            document.body.appendChild(overlay);
+        }
+
         function openCase(){
             if(coins<CASE_COST){alert('Мало брейнкоинов!');return;}
             coins-=CASE_COST;var item,roll=Math.random()*100,cum=0;
             if(pity>=10){var rp=items.filter(function(i){return['rare','epic','legendary','mythic'].includes(i.rarity)});item=rp[Math.floor(Math.random()*rp.length)];}
             else{for(var i=0;i<items.length;i++){cum+=items[i].chance;if(roll<=cum){item=items[i];break;}}if(!item)item=items[0];}
             totalOpens++;pity=['epic','legendary','mythic','rare'].includes(item.rarity)?0:pity+1;
-            if(['chrome','common','rare','epic','legendary','mythic'].indexOf(item.rarity)>['chrome','common','rare','epic','legendary','mythic'].indexOf(bestRarity))bestRarity=item.rarity;
-            var isShiny=Math.random()<0.02;
-            // ВАЖНО: сначала вставляем в базу, потом обновляем инвентарь
+            var ranks=['chrome','common','rare','epic','legendary','mythic'];if(ranks.indexOf(item.rarity)>ranks.indexOf(bestRarity))bestRarity=item.rarity;
+            var isShiny=Math.random()<0.02,isRare=['rare','epic','legendary','mythic'].includes(item.rarity);
+            
+            // Сначала вставляем карту в базу
             supabase.from('inventory').insert({player_tg_id:tgId,item_id:item.id,item_name:item.name+(isShiny?' ✨':''),rarity:item.rarity,emoji:item.emoji,evolution:0,upgrade_level:0,is_shiny:isShiny}).then(function(){
                 supabase.from('players').upsert({tg_id:tgId,total_opens:totalOpens,pity_counter:pity,best_rarity:bestRarity,coins:coins,last_seen:new Date().toISOString()}).then(function(){});
-                loadAllInv();renderInventory();
+                supabase.from('inventory').select('*').eq('player_tg_id',tgId).then(function(res){allInv=res.data||[];renderInventory();updateUI();});
+                
+                if(isRare){
+                    // Тряска и анимация на весь экран
+                    document.getElementById('mainContainer').classList.add('shake');
+                    setTimeout(function(){document.getElementById('mainContainer').classList.remove('shake')},600);
+                    document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;
+                    // Показываем НЕУБИРАЕМУЮ анимацию (только по нажатию)
+                    setTimeout(function(){showRareDropOverlay(item,isShiny);},300);
+                }else{
+                    document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;
+                }
             });
-            var isRare=['rare','epic','legendary','mythic'].includes(item.rarity);
-            if(isRare){document.getElementById('result').innerHTML='<div style="font-size:35px">💫</div><p style="color:#ff00ff">Чувствую что-то мощное...</p>';document.getElementById('mainContainer').classList.add('shake');setTimeout(function(){document.getElementById('mainContainer').classList.remove('shake')},600);setTimeout(function(){document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;if(item.rarity==='legendary'||item.rarity==='mythic'){document.body.style.background=item.rarity==='mythic'?'#1a0000':'#1a0f00';setTimeout(function(){document.body.style.background='#0a0a0a'},1500);}},800);}
-            else{document.getElementById('result').innerHTML='<span style="font-size:50px">'+item.emoji+(isShiny?'✨':'')+'</span><br><b style="color:'+(rarityColors[item.rarity]||'#fff')+'">'+item.rarity.toUpperCase()+(isShiny?' SHINY':'')+'</b><br>'+item.name;}
-            updateUI();
         }
 
         function sellItem(){var id=document.getElementById('auctionItemSelect').value,pr=parseInt(document.getElementById('auctionPrice').value);if(!id||!pr)return;supabase.from('auctions').insert({seller_tg_id:tgId,inventory_id:parseInt(id),price:pr,status:'active'}).then(function(r){if(r.error)alert('Ошибка');else{alert('✅ Выставлено!');loadAllInv();renderInventory();loadAuction();}});}
